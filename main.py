@@ -14,7 +14,12 @@ try:
     cursor.execute("CREATE TABLE a (id text, igname text)")
 except:
     pass
+<<<<<<< HEAD
 #testcomment
+=======
+print("a")
+
+>>>>>>> bd57718c623df51ee61e76e2ea5e9459fa42c6a7
 def database_work():
     global cursor,conn,bot,m_id_old,AllOk
     while(AllOk):
