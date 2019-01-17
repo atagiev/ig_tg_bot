@@ -14,7 +14,7 @@ try:
     cursor.execute("CREATE TABLE a (id text, igname text)")
 except:
     pass
-
+#testcomment
 def database_work():
     global cursor,conn,bot,m_id_old,AllOk
     while(AllOk):
