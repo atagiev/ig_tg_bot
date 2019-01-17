@@ -3,7 +3,7 @@ import telepot
 import config
 import sqlite3
 from threading import Thread
-
+#connect ig library
 AllOk=True
 f=open("message_id.txt","r")
 m_id_old=int(f.read())
