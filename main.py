@@ -14,11 +14,10 @@ try:
     cursor.execute("CREATE TABLE a (id text, igname text)")#возможно стоит хранить дату послднего обновления иг
 except:
     pass
-
-#добавить словать ников иг
-#заполнить словарь никами из бд
-
-
+allIGnicks=set()
+cursor.execute("SELECT igname FROM a")
+for j in cursor.fetchall():
+    allIGnicks.add(j[0])
 
 #обработка входящих сообщений с тг и добавление ников в бд
 def database_work():
@@ -31,12 +30,12 @@ def database_work():
             if (m_id>m_id_old):
                 try:
                     text=upd[0]["message"]["text"]
-                    if ((text=="/stop") and (c_id==config.admin_id)):
+                    if ((text=="/stopBot") and (c_id in config.admin_id)):
                         AllOk=False;
                     else:
                         if (text[0:3]=="add"):
                             cursor.execute("INSERT INTO a VALUES(?,?)",(c_id,text[4:],))
-                            #добавлять в словарь ник
+                            allIGnicks.add(text[4:])
                         if (text[0:3]=="del"):
                             cursor.execute("DELETE FROM a WHERE (id= ?) AND (igname= ?)",(c_id,text[4:],))
                         conn.commit()
@@ -55,7 +54,7 @@ def database_work():
 #работа с новыми постами и историями из ig
 def ig_checker():
     print('a')
-    #проверку наличия ников в бд(исключение лишних)
+    #проверку наличия ников в бд(исключение лишних) через множество.discard
 
 
 Thread(target = database_work).start()
