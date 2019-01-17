@@ -49,6 +49,7 @@ def ig_checker():
     print('a')
 
 
+
 Thread(target = database_work).start()
 time.sleep(1)
 Thread(target = ig_checker).start()
