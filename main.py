@@ -15,6 +15,9 @@ try:
 except:
     pass
 
+#добавить словать ников иг
+#заполнить словарь никами из бд
+
 
 
 #обработка входящих сообщений с тг и добавление ников в бд
@@ -33,6 +36,7 @@ def database_work():
                     else:
                         if (text[0:3]=="add"):
                             cursor.execute("INSERT INTO a VALUES(?,?)",(c_id,text[4:],))
+                            #добавлять в словарь ник
                         if (text[0:3]=="del"):
                             cursor.execute("DELETE FROM a WHERE (id= ?) AND (igname= ?)",(c_id,text[4:],))
                         conn.commit()
@@ -51,7 +55,7 @@ def database_work():
 #работа с новыми постами и историями из ig
 def ig_checker():
     print('a')
-
+    #проверку наличия ников в бд(исключение лишних)
 
 
 Thread(target = database_work).start()
