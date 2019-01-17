@@ -14,14 +14,10 @@ try:
     cursor.execute("CREATE TABLE a (id text, igname text)")#возможно стоит хранить дату последнего обновления иг
 except:
     pass
-allIGnicks=set()
-cursor.execute("SELECT igname FROM a")
-for j in cursor.fetchall():
-    allIGnicks.add(j[0])
 
 #обработка входящих сообщений с тг и добавление ников в бд
 def database_work():
-    global cursor,conn,bot,m_id_old,AllOk,allIGnicks
+    global cursor,conn,bot,m_id_old,AllOk
     while(AllOk):
         try:
             upd=bot.getUpdates(-1)
@@ -35,7 +31,6 @@ def database_work():
                     else:
                         if (text[0:3]=="add"):
                             cursor.execute("INSERT INTO a VALUES(?,?)",(c_id,text[4:],))
-                            allIGnicks.add(text[4:])
                         if (text[0:3]=="del"):
                             cursor.execute("DELETE FROM a WHERE (id= ?) AND (igname= ?)",(c_id,text[4:],))
                         conn.commit()
@@ -53,17 +48,18 @@ def database_work():
 
 #работа с новыми постами и историями из ig
 def ig_checker():
-    global conn,cursor,bot,AllOk,allIGnicks
+    global conn,cursor,bot,AllOk
+    allIGnicks=set()
     while (AllOk):
+        allIGnicks.clear()
         cursor.execute("SELECT igname FROM a")
-        # исключить из множества allIGnicks данные с бд
-
-    #проверку наличия ников в бд(исключение лишних) через множество.discard
-    #может исключать все множество из множества
+        for j in cursor.fetchall():
+            allIGnicks.add(j[0])
+        #тут пройтись по множеству и чекнуть иг
 
 
 Thread(target = database_work).start()
-time.sleep(1)#мб не надо, но пусть на всякий случай будет
+time.sleep(1)
 Thread(target = ig_checker).start()
 f=open("message_id.txt","w")
 f.write(str(m_id_old))
