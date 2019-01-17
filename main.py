@@ -15,10 +15,10 @@ try:
 except:
     pass
 
-#testcomment
 
 print("a")
 
+#обработка входящих сообщений с тг и добавление ников в бд
 def database_work():
     global cursor,conn,bot,m_id_old,AllOk
     while(AllOk):
@@ -49,13 +49,14 @@ def database_work():
         except:
             pass
 
+#работа с новыми постами и историями
 def ig_checker():
     print('a')
 
 
 
 Thread(target = database_work).start()
-time.sleep(1)
+time.sleep(1)#мб не надо, но пусть на всякий случай будет
 Thread(target = ig_checker).start()
 f=open("message_id.txt","w")
 f.write(str(m_id_old))
