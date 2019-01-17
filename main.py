@@ -11,7 +11,7 @@ bot=telepot.Bot(config.TOKEN)
 conn=sqlite3.connect("database.db")
 cursor=conn.cursor()
 try:
-    cursor.execute("CREATE TABLE a (id text, igname text)")#возможно стоит хранить дату послднего обновления иг
+    cursor.execute("CREATE TABLE a (id text, igname text)")#возможно стоит хранить дату последнего обновления иг
 except:
     pass
 allIGnicks=set()
@@ -53,11 +53,13 @@ def database_work():
 
 #работа с новыми постами и историями из ig
 def ig_checker():
+    global conn,cursor,bot,AllOk,allIGnicks
     while (AllOk):
         cursor.execute("SELECT igname FROM a")
         # исключить из множества allIGnicks данные с бд
 
     #проверку наличия ников в бд(исключение лишних) через множество.discard
+    #может исключать все множество из множества
 
 
 Thread(target = database_work).start()
