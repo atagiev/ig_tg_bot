@@ -17,7 +17,7 @@ except:
 
 
 
-#обработка входящих сообщений с тг и добавление ников в бд
+#обработка входящих сообщений с тг и добавление ников в бд 
 def database_work():
     global cursor,conn,bot,m_id_old,AllOk
     while(AllOk):
