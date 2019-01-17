@@ -21,7 +21,6 @@ for j in cursor.fetchall():
 
 #обработка входящих сообщений с тг и добавление ников в бд
 def database_work():
-    global cursor,conn,bot,m_id_old,AllOk
     while(AllOk):
         try:
             upd=bot.getUpdates(-1)
@@ -53,7 +52,10 @@ def database_work():
 
 #работа с новыми постами и историями из ig
 def ig_checker():
-    print('a')
+    while (AllOk):
+        cursor.execute("SELECT igname FROM a")
+        # исключить из множества allIGnicks данные с бд
+
     #проверку наличия ников в бд(исключение лишних) через множество.discard
 
 
