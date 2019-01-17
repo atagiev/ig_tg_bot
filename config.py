@@ -1,2 +1,2 @@
-TOKEN=''
-admin_id=''
+TOKEN=""
+admin_id=["",""]
