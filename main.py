@@ -11,13 +11,13 @@ bot=telepot.Bot(config.TOKEN)
 conn=sqlite3.connect("database.db")
 cursor=conn.cursor()
 try:
-    cursor.execute("CREATE TABLE a (id text, igname text)")
+    cursor.execute("CREATE TABLE a (id text, igname text)")#возможно стоит хранить дату послднего обновления иг
 except:
     pass
 
 
 
-#обработка входящих сообщений с тг и добавление ников в бд 
+#обработка входящих сообщений с тг и добавление ников в бд
 def database_work():
     global cursor,conn,bot,m_id_old,AllOk
     while(AllOk):
