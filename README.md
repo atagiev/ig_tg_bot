@@ -1,2 +1,2 @@
 # ig_tg_bot
-View IG stories in Telegram
+View IG stories and posts in Telegram

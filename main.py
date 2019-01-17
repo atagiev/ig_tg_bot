@@ -21,6 +21,7 @@ for j in cursor.fetchall():
 
 #обработка входящих сообщений с тг и добавление ников в бд
 def database_work():
+    global cursor,conn,bot,m_id_old,AllOk,allIGnicks
     while(AllOk):
         try:
             upd=bot.getUpdates(-1)
