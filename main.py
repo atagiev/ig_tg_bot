@@ -48,7 +48,7 @@ def database_work():
         except:
             pass
 
-#работа с новыми постами и историями
+#работа с новыми постами и историями из ig
 def ig_checker():
     print('a')
 
