@@ -55,6 +55,7 @@ def ig_checker():
         cursor.execute("SELECT igname FROM a")
         for j in cursor.fetchall():
             allIGnicks.add(j[0])
+        
         #тут пройтись по множеству и чекнуть иг
 
 
