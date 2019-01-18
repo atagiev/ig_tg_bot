@@ -34,10 +34,12 @@ def database_work():
                     text=upd[0]["message"]["text"]
                     if ((text=="/stopBot") and (c_id in config.admin_id)):
                         AllOk=False;
+                    elif (text=="/help"):
+                        bot.sendMessage(c_id,config.help)
                     else:
-                        if (text[0:3]=="add"):
+                        if ((text[0:3]=="add") or(text[0:3]=="Add")):
                             cursor.execute("INSERT INTO subs VALUES(?,?)",(c_id,text[4:],))
-                        if (text[0:3]=="del"):
+                        if ((text[0:3]=="del") or (text[0:3]=="Del")):
                             cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(c_id,text[4:],))
                         conn.commit()
                         cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(c_id,))
