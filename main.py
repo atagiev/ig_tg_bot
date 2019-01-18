@@ -36,6 +36,8 @@ def database_work():
                         AllOk=False;
                     elif (text=="/help"):
                         bot.sendMessage(c_id,config.help)
+                    elif (text=="/start"):
+                        bot.sendMessage(c_id,config.start)
                     else:
                         if ((text[0:3]=="add") or(text[0:3]=="Add")):
                             cursor.execute("INSERT INTO subs VALUES(?,?)",(c_id,text[4:],))
