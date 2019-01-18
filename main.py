@@ -57,10 +57,8 @@ def parseIGposts(igname,postid,posttext):
     myfeed=feedparser.parse(workinglink)
     s=myfeed.entries[0]["link"]
     postid=s[26:37]
-    
-    #parsing posttext
-
-
+    s=myfeed.entries[0]["description"]
+    posttext=s[:s.find("<a href=https://")]
 
 #работа с новыми постами в ig
 def ig_posts():
