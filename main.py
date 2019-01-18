@@ -11,7 +11,11 @@ bot=telepot.Bot(config.TOKEN)
 conn=sqlite3.connect("database.db")
 cursor=conn.cursor()
 try:
-    cursor.execute("CREATE TABLE a (id text, igname text)")#возможно стоит хранить дату последнего обновления иг
+    cursor.execute("CREATE TABLE subs (tgid text, igname text)")#возможно стоит хранить дату последнего обновления иг
+except:
+    pass
+try:
+    cursor.execute("CREATE TABLE posts (igname text, postid text)")
 except:
     pass
 
@@ -30,11 +34,11 @@ def database_work():
                         AllOk=False;
                     else:
                         if (text[0:3]=="add"):
-                            cursor.execute("INSERT INTO a VALUES(?,?)",(c_id,text[4:],))
+                            cursor.execute("INSERT INTO subs VALUES(?,?)",(c_id,text[4:],))
                         if (text[0:3]=="del"):
-                            cursor.execute("DELETE FROM a WHERE (id= ?) AND (igname= ?)",(c_id,text[4:],))
+                            cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(c_id,text[4:],))
                         conn.commit()
-                        cursor.execute("SELECT igname FROM a WHERE id = ?",(c_id,))
+                        cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(c_id,))
                         substring="Вы подписаны на \n"
                         for i in cursor.fetchall():
                             substring=substring+i[0]+"\n"
@@ -46,22 +50,38 @@ def database_work():
         except:
             pass
 
-#работа с новыми постами и историями из ig
-def ig_checker():
+
+def parseIGposts(igname,postid,link,posttext):
+    pass
+
+#работа с новыми постами в ig
+def ig_posts():
     global conn,cursor,bot,AllOk
     allIGnicks=set()
     while (AllOk):
         allIGnicks.clear()
-        cursor.execute("SELECT igname FROM a")
+        cursor.execute("SELECT igname FROM subs")
         for j in cursor.fetchall():
             allIGnicks.add(j[0])
-        
-        #тут пройтись по множеству и чекнуть иг
+        for j in allIGnicks:
+            parseIGposts(j,postid,link,posttext)
+            cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
+            if (postid <> cursor.fetchone()[0]):
+                cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
+                cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
+                conn.commit()
+                msgtext=j+" posted new [photo]("+link+")"#мб работает
+                cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
+                for i in cursor.fetchall():
+                    bot.sendMessage(i[0],msgtext, Markdown)
+
+
+
 
 
 Thread(target = database_work).start()
 time.sleep(1)
-Thread(target = ig_checker).start()
+Thread(target = ig_posts).start()
 f=open("message_id.txt","w")
 f.write(str(m_id_old))
 cursor.close()
