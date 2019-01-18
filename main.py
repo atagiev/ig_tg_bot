@@ -89,7 +89,14 @@ def ig_posts():
 
 #обработка историй из иг
 def ig_stories():
-    pass
+    global conn,cursor,bot,AllOk
+    allIGnicks=set()
+    while (AllOk):
+        allIGnicks.clear()
+        cursor.execute("SELECT igname FROM subs")
+        for j in cursor.fetchall():
+            allIGnicks.add(j[0])
+        
 
 
 Thread(target = database_work).start()
