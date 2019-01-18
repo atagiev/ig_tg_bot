@@ -1,3 +1,4 @@
+# need pip3 install telepot, feedparser
 import time
 import telepot
 import config
@@ -76,7 +77,7 @@ def ig_posts():
                 cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
                 cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
                 conn.commit()
-                msgtext=j+" posted new [photo](https://instagram.com/p/"+link+")"+" with comment:\n"+"_"+posttext+"_"#мб работает
+                msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
                 cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
                 for i in cursor.fetchall():
                     bot.sendMessage(i[0],msgtext, Markdown)
