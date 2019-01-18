@@ -2,6 +2,7 @@ import time
 import telepot
 import config
 import sqlite3
+import feedparser
 from threading import Thread
 #connect ig library
 AllOk=True
