@@ -4,7 +4,7 @@ import config
 import sqlite3
 import feedparser
 from threading import Thread
-#connect ig library
+
 AllOk=True
 f=open("message_id.txt","r")
 m_id_old=int(f.read())
@@ -12,7 +12,7 @@ bot=telepot.Bot(config.TOKEN)
 conn=sqlite3.connect("database.db")
 cursor=conn.cursor()
 try:
-    cursor.execute("CREATE TABLE subs (tgid text, igname text)")#возможно стоит хранить дату последнего обновления иг
+    cursor.execute("CREATE TABLE subs (tgid text, igname text)")
 except:
     pass
 try:
@@ -51,7 +51,7 @@ def database_work():
         except:
             pass
 
-
+#парсинг rss ленты с https://websta.me/rss/n/username
 def parseIGposts(igname,postid,link,posttext):
     pass
 
@@ -71,7 +71,7 @@ def ig_posts():
                 cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
                 cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
                 conn.commit()
-                msgtext=j+" posted new [photo]("+link+")"#мб работает
+                msgtext=j+" posted new [photo]("+link+")"+" with comment: _"+posttext+"_"#мб работает
                 cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
                 for i in cursor.fetchall():
                     bot.sendMessage(i[0],msgtext, Markdown)
