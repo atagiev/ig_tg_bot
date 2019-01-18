@@ -34,6 +34,7 @@ def database_work():
                     text=upd[0]["message"]["text"]
                     if ((text=="/stopBot") and (c_id in config.admin_id)):
                         AllOk=False;
+                        bot.sendMessage(c_id,config.stopBot)
                     elif (text=="/help"):
                         bot.sendMessage(c_id,config.help)
                     elif (text=="/start"):
