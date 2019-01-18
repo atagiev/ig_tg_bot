@@ -53,7 +53,11 @@ def database_work():
 
 #парсинг rss ленты с https://websta.me/rss/n/username
 def parseIGposts(igname,postid,link,posttext):
-    pass
+    workinglink="https://websta.me/rss/n/"+igname
+    #parsing posttext,postid
+    link = "https://instagram.com/p/"+postid
+
+
 
 #работа с новыми постами в ig
 def ig_posts():
