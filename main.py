@@ -52,14 +52,13 @@ def database_work():
             pass
 
 #парсинг rss ленты с https://websta.me/rss/n/username
-def parseIGposts(igname,postid,link,posttext):
+def parseIGposts(igname,postid,posttext):
     workinglink="https://websta.me/rss/n/"+igname
     myfeed=feedparser.parse(workinglink)
     s=myfeed.entries[0]["link"]
     postid=s[26:37]
     
     #parsing posttext
-    link = "https://instagram.com/p/"+postid
 
 
 
@@ -73,24 +72,26 @@ def ig_posts():
         for j in cursor.fetchall():
             allIGnicks.add(j[0])
         for j in allIGnicks:
-            parseIGposts(j,postid,link,posttext)
+            parseIGposts(j,postid,posttext)
             cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
             if (postid <> cursor.fetchone()[0]):
                 cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
                 cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
                 conn.commit()
-                msgtext=j+" posted new [photo]("+link+")"+" with comment: _"+posttext+"_"#мб работает
+                msgtext=j+" posted new [photo](https://instagram.com/p/"+link+")"+" with comment:\n"+"_"+posttext+"_"#мб работает
                 cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
                 for i in cursor.fetchall():
                     bot.sendMessage(i[0],msgtext, Markdown)
 
-
-
+#обработка историй из иг
+def ig_stories():
+    pass
 
 
 Thread(target = database_work).start()
 time.sleep(1)
 Thread(target = ig_posts).start()
+Thread(target = ig_stories).start()
 f=open("message_id.txt","w")
 f.write(str(m_id_old))
 cursor.close()
