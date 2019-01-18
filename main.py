@@ -4,7 +4,6 @@ import telepot
 import config
 import sqlite3
 import feedparser
-#from threading import Thread
 
 AllOk=True
 time_OLD=time.time()
@@ -68,6 +67,7 @@ def parse_IG_posts(igname,postid,posttext):
 
 #работа с новыми постами в ig
 def ig_posts(j):
+        global conn,cursor,bot
         parse_IG_posts(j,postid,posttext)
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
         if (postid <> cursor.fetchone()[0]):
@@ -79,8 +79,9 @@ def ig_posts(j):
             for i in cursor.fetchall():
                 bot.sendMessage(i[0],msgtext, Markdown)
 
+#общая работа с инстой
 def Instagram_Work():
-    global conn,cursor,bot,AllOk
+    global cursor
     allIGnicks=set()
     allIGnicks.clear()
     cursor.execute("SELECT igname FROM subs")
@@ -97,8 +98,6 @@ while AllOk:
         time_OLD=time.time()
         Instagram_Work()
 
-#Thread(target = Telegram_Work).start()
-#Thread(target = Instagram_Work).start()
 f=open("message_id.txt","w")
 f.write(str(m_id_old))
 cursor.close()
