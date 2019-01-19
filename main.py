@@ -41,8 +41,10 @@ def Telegram_Work():
                 else:
                     if ((text[0:3]=="add") or(text[0:3]=="Add")):
                         cursor.execute("INSERT INTO subs VALUES(?,?)",(c_id,text[4:],))
-                    if ((text[0:3]=="del") or (text[0:3]=="Del")):
+                    elif ((text[0:3]=="del") or (text[0:3]=="Del")):
                         cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(c_id,text[4:],))
+                    else:
+                        cursor.execute("INSERT INTO subs VALUES(?,?)",(c_id,text,))
                     conn.commit()
                     cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(c_id,))
                     substring="Вы подписаны на \n"
