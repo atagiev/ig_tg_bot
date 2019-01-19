@@ -12,7 +12,7 @@ msg_list=[]#склад сообщений с телеги
 f=open("message_id.txt","r")#последнее сообщение
 m_id_old=int(f.read())
 bot=telepot.Bot(config.TOKEN)
-conn=sqlite3.connect("database.db")
+conn=sqlite3.connect("database.db")#подключение базы данных
 cursor=conn.cursor()
 try:
     cursor.execute("CREATE TABLE subs (tgid text, igname text)")
