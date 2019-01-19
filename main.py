@@ -1,29 +1,30 @@
-# need pip3 install telepot, feedparser
+# need pip3 install telepot, feedparser, beautifulsoup4
 import time
 import telepot
 import config
 import sqlite3
 import feedparser
+import beautifulsoup
 from threading import Thread
 
-AllOk=True#работаем пока True
-time_OLD=time.time()#время последней проверки инсты
-msg_list=[]#склад сообщений с телеги
-f=open("message_id.txt","r")#последнее сообщение
+AllOk=True#program works while True
+time_OLD=time.time()#time of last Instagram check
+msg_list=[]#archive of telegram messages
+f=open("message_id.txt","r")#last telegram message
 m_id_old=int(f.read())
 bot=telepot.Bot(config.TOKEN)
-conn=sqlite3.connect("database.db")#подключение базы данных
+conn=sqlite3.connect("database.db")#connecting database
 cursor=conn.cursor()
 try:
-    cursor.execute("CREATE TABLE subs (tgid text, igname text)")#тут храним пользователь в телеги - подписка в инсте
+    cursor.execute("CREATE TABLE subs (tgid text, igname text)")#table telegram name - account in Instagram
 except:
     pass
 try:
-    cursor.execute("CREATE TABLE posts (igname text, postid text)")#тут храним имя в инсте и последний пост
+    cursor.execute("CREATE TABLE posts (igname text, postid text)")#table Instagram name - id of last post
 except:
     pass
 
-#фоновая проверка входящих сообщений в телеге
+#parallel thread to check new Telegram messages
 def Telegram_checker():
     global bot,msg_list,m_id_old,AllOk
     while AllOk:
@@ -42,13 +43,13 @@ def Telegram_checker():
         except:
             pass
 
-#обработка входящих сообщений из msg_list
+#processing incoming messages from msg_list
 def Message_Work():
     global cursor,conn,bot,AllOk,msg_list
     for msg in msg_list:
-        chat=msg[:msg.find("%")]#извлечение данных сообщния со склада
+        chat=msg[:msg.find("%")]#working with archive of messages
         text=msg[msg.find("%")+1:]
-        msg_list.remove(msg)#удаление прочитанного сообщения
+        msg_list.remove(msg)#delete read message
         if ((text=="/stopBot") and (chat in config.admin_id)):
             AllOk=False;
             bot.sendMessage(chat,config.stopBot)
@@ -68,10 +69,10 @@ def Message_Work():
             substring="Вы подписаны на \n"
             for i in cursor.fetchall():
                 substring=substring+i[0]+"\n"
-            bot.sendMessage(chat,substring)#вывод подписок
+            bot.sendMessage(chat,substring)#send message with subscriptions
             substring=""
 
-#парсинг rss ленты с https://websta.me/rss/n/username
+#parsing rss from https://websta.me/rss/n/username
 def parse_IG_posts(igname,postid,posttext):
     workinglink="https://websta.me/rss/n/"+igname
     myfeed=feedparser.parse(workinglink)
@@ -80,40 +81,40 @@ def parse_IG_posts(igname,postid,posttext):
     s=myfeed.entries[0]["description"]
     posttext=s[:s.find("<a href=https://")]
 
-#работа с новыми постами в ig
+#working with new POSTS from ig
 def ig_posts(j):
         global conn,cursor,bot
         parse_IG_posts(j,postid,posttext)
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
         if (postid <> cursor.fetchone()[0]):
             cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#перезапись ид последного поста
+            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#rewrite last post id
             conn.commit()
             msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
             cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
             for i in cursor.fetchall():
-                bot.sendMessage(i[0],msgtext, Markdown)#расслыка тем, кто подписан на этот аккаунт
+                bot.sendMessage(i[0],msgtext, Markdown)#sending messages to followers
 
-#общая работа с инстой
+#Working with Instagram
 def Instagram_Work():
     global cursor
     allIGnicks=set()
     allIGnicks.clear()
     cursor.execute("SELECT igname FROM subs")
     for j in cursor.fetchall():
-        allIGnicks.add(j[0])#сбор всех ников инсты в множество
+        allIGnicks.add(j[0])#collect all Ig names into set
     for j in allIGnicks:
         ig_posts(j)
         ig_stories(j)
 
 #main
-Thread(target=Telegram_checker).start()#в параллельном потоке в msg_list будут складываться входящие сообщения
+Thread(target=Telegram_checker).start()#in a parallel thread messages are recorded in the archive msg_list
 while AllOk:
     Message_Work()
-    if ((time.time()-time_OLD)>120):#раз в 2 мин проходимся по инсте
+    if ((time.time()-time_OLD)>120):#check Instagram every 2 minutes
         time_OLD=time.time()
         Instagram_Work()
 
-f=open("message_id.txt","w")#сохранение нужных данных перед выходом
+f=open("message_id.txt","w")#saving important data before exit
 f.write(str(m_id_old))
 cursor.close()
