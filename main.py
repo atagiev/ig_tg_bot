@@ -8,6 +8,7 @@ import beautifulsoup
 from threading import Thread
 
 AllOk=True#program works while True
+logOn=False#if True - logs are enabled
 time_OLD=time.time()#time of last Instagram check
 msg_list=[]#archive of telegram messages
 f=open("message_id.txt","r")#last telegram message
@@ -43,9 +44,16 @@ def Telegram_checker():
         except:
             pass
 
+#send logs to admins
+def Log_Send(msg):
+    global bot,logOn
+    if logOn:
+        for i in config.admin_id:
+            bot.sendMessage(i,msg)
+
 #processing incoming messages from msg_list
 def Message_Work():
-    global cursor,conn,bot,AllOk,msg_list
+    global cursor,conn,bot,AllOk,msg_list,logOn
     for msg in msg_list:
         chat=msg[:msg.find("%")]#working with archive of messages
         text=msg[msg.find("%")+1:]
@@ -57,6 +65,12 @@ def Message_Work():
             bot.sendMessage(chat,config.help)
         elif (text=="/start"):
             bot.sendMessage(chat,config.start)
+        elif ((text=="/log") and (chat in config.admin_id)):
+            if logOn:
+                Log_Send(config.logmsgOff)
+            else:
+                Log_Send(config.logmsgOff)
+            logOn=not logOn
         else:
             if ((text[0:3]=="add") or(text[0:3]=="Add")):
                 cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[4:],))
@@ -121,7 +135,9 @@ while AllOk:
     if ((time.time()-time_OLD)>120):#check Instagram every 2 minutes
         time_OLD=time.time()
         Instagram_Work()
+        Log_Send(config.logmsgInstagramCheck)
 
 f=open("message_id.txt","w")#saving important data before exit
 f.write(str(m_id_old))
+Log_Send(config.logmsgBotOff)
 cursor.close()
