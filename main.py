@@ -85,6 +85,11 @@ def parse_IG_posts(igname,postid,posttext):
 def ig_posts(j):
         global conn,cursor,bot
         parse_IG_posts(j,postid,posttext)
+        try:
+            cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
+            cursor.fetchone()[0]
+        except:
+            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
         if (postid <> cursor.fetchone()[0]):
             cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
