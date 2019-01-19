@@ -15,11 +15,11 @@ bot=telepot.Bot(config.TOKEN)
 conn=sqlite3.connect("database.db")#подключение базы данных
 cursor=conn.cursor()
 try:
-    cursor.execute("CREATE TABLE subs (tgid text, igname text)")
+    cursor.execute("CREATE TABLE subs (tgid text, igname text)")#тут храним пользователь в телеги - подписка в инсте
 except:
     pass
 try:
-    cursor.execute("CREATE TABLE posts (igname text, postid text)")
+    cursor.execute("CREATE TABLE posts (igname text, postid text)")#тут храним имя в инсте и последний пост
 except:
     pass
 
