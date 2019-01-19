@@ -89,7 +89,9 @@ def ig_posts(j):
             cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
             cursor.fetchone()[0]#try to catch TypeError if no record with this igname
         except:
+            #write postid instread of other to don't send post published before user send message to Telegram bot
             cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
+            conn.commit()
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
         if (postid <> cursor.fetchone()[0]):
             cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
