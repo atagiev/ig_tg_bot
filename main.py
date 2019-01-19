@@ -87,7 +87,7 @@ def ig_posts(j):
         parse_IG_posts(j,postid,posttext)
         try:
             cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-            cursor.fetchone()[0]
+            cursor.fetchone()[0]#try to catch TypeError if no record with this igname
         except:
             cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
