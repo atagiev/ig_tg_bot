@@ -4,7 +4,8 @@ import telepot
 import config
 import sqlite3
 import feedparser
-import beautifulsoup
+import requests
+import bs4
 from threading import Thread
 
 AllOk=True#program works while True
@@ -22,6 +23,10 @@ except:
     pass
 try:
     cursor.execute("CREATE TABLE posts (igname text, postid text)")#table Instagram name - id of last post
+except:
+    pass
+try:
+    cursor.execute("CREATE TABLE stories (igname text, date text)")#table Instagram name - date of last story
 except:
     pass
 
@@ -115,6 +120,68 @@ def ig_posts(j):
             cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
             for i in cursor.fetchall():#sending messages to followers
                 bot.sendMessage(i[0],msgtext, Markdown)
+
+#parsing https://storiesig.com/stories/username
+def parseMainStoryPage(j,lastcheck,links):
+    workinglink="https://storiesig.com/stories/"+j
+    r=requests.get(workinglink)
+    b=bs4.BeautifulSoup(r.text,"html.parser")
+    парсим, проходимся по постам где дата больше чем lastcheck
+    добавляем ссылки на картинки и видео в множество links
+    смотрим дату последнего поста и заменяем lastcheck на нее
+    pass
+
+
+#parsing page with other stories
+def parseSubStoryPage(storylink,lastcheck,links):
+    парсим, проходимся по постам где дата больше чем lastcheck
+    добавляем ссылки на картинки и видео в множество links
+    pass
+
+#parsing https://storiesig.com/?username=username
+def parseMainPageIgStory(j,lastdate,finishlinks):
+    maxdate=lastdate
+    lastcheck=lastdate
+    workinglink="https://storiesig.com/?username="+j
+    r=requests.get(workinglink)
+    b=bs4.BeautifulSoup(r.text,"html.parser")
+    if (b.find("strong").getText()<>"0 stories"):
+        parseMainStoryPage(j,lastcheck,finishlinks)
+        if (lastcheck>maxdate):
+            maxdate=lastcheck
+    for i in b.find_all("time"):
+        lastcheck=lastdate
+        if (str(i.get("datetime"))>lastdate):
+            workinglink="https://storiesig.com"+str(i.parent.parent.get("href"))
+            parseSubStoryPage(workinglink,lastcheck,links)
+            if (lastcheck>maxdate):
+                maxdate=lastcheck
+
+    lastdate=maxdate
+
+
+#working with STORIES from ig
+def ig_stories(j):
+    global bot,conn,cursor
+    try:
+        cursor.execute("SELECT date FROM stories WHERE igname = ?",(j,))
+        cursor.fetchone()[0]#try to catch TypeError if no record with this igname
+    except:
+        cursor.execute("INSERT INTO stories VALUES(?,?)",(j,time.strftime("%Y-%m-%dT%H-%M-%S.999Z"),))
+        conn.commit()#write time
+    cursor.execute("SELECT date FROM stories WHERE igname = ?",(j,))
+    lastdate=cursor.fetchone()[0]
+    finishlinks=set()
+    parseMainPageIgStory(j,lastdate,finishlinks)#return links to stories
+    cursor.execute("DELETE FROM stories WHERE igname = ?",(j,))
+    cursor.execute("INSERT INTO stories VALUES(?,?)",(j,lastdate,))
+    conn.commit()#rewrite lastdate
+    cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
+    for k in cursor.fetchall():
+        for i in finishlinks:
+            msgtext=j+" posted new [story]("+i+")"
+            bot.sendMessage(k[0],msgtext,Markdown)
+    finishlinks.clear()
 
 #Working with Instagram
 def Instagram_Work():
