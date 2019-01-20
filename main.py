@@ -92,23 +92,22 @@ def Message_Work():
                 substring=""
 
 #parsing rss from https://websta.me/rss/n/username
-def parse_IG_posts(igname,postid,posttext):
-    try:
-        workinglink="https://websta.me/rss/n/"+igname
-        myfeed=feedparser.parse(workinglink)
-        s=myfeed.entries[0]["link"]
-        postid=s[26:37]
-        s=myfeed.entries[0]["description"]
-        posttext=s[:s.find("<a href=https://")]
-    except:
-        pass
+def parse_IG_posts(igname):
+    workinglink="https://websta.me/rss/n/"+igname
+    myfeed=feedparser.parse(workinglink)
+    s=myfeed.entries[0]["link"]
+    postid=s[26:37]
+    s=myfeed.entries[0]["description"]
+    posttext=s[:s.find("<a href=https://")]
+    return postid,posttext
 
 #working with new POSTS from ig
 def ig_posts(j):
     global conn,cursor,bot
-    postid=""
-    posttext=""
-    parse_IG_posts(j,postid,posttext)
+    try:
+        postid,posttext=parse_IG_posts(j)
+    except:
+        postid,posttext="",""
     try:
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
         cursor.fetchone()[0]#try to catch TypeError if no record with this igname
@@ -137,17 +136,18 @@ def parseSubStoryPage(workinglink,lastcheck,finishlinks):
         for i in b.find_all("article"):
             if (str(i.span.time.get("datetime"))>lastcheck):
                 try:
-                    finishlinks.append(i.img.get("src"))
+                    finishlinks.add(i.img.get("src"))
                 except:
-                    finishlinks.append(i.video.get("src"))
+                    finishlinks.add(i.video.get("src"))
                 maxdate=str(i.span.time.get("datetime"))#stories are sorted by time, last story - max time
-        lastcheck=maxdate
     except:
         pass
+    return maxdate,finishlinks
 
 #parsing https://storiesig.com/?username=username
-def parseMainPageIgStory(j,lastdate,finishlinks):
+def parseMainPageIgStory(j,lastdate):
     maxdate=lastdate
+    finishlinks=set()
     lastcheck=lastdate
     workinglink="https://storiesig.com/?username="+j
     r=requests.get(workinglink)
@@ -155,20 +155,19 @@ def parseMainPageIgStory(j,lastdate,finishlinks):
     try:
         if not(b.find("strong").getText()=="0 stories"):
             workinglink="https://storiesig.com/stories/"+j
-            parseSubStoryPage(workinglink,lastcheck,finishlinks)
+            lastcheck,finishlinks=parseSubStoryPage(workinglink,lastcheck,finishlinks)
             if (lastcheck>maxdate):
                 maxdate=lastcheck
         for i in b.find_all("time"):
             lastcheck=lastdate
             if (str(i.get("datetime"))>lastdate):
                 workinglink="https://storiesig.com"+str(i.parent.parent.get("href"))
-                parseSubStoryPage(workinglink,lastcheck,finishlinks)
+                lastcheck,finishlinks=parseSubStoryPage(workinglink,lastcheck,finishlinks)
                 if (lastcheck>maxdate):
                     maxdate=lastcheck
     except:
         pass
-    lastdate=maxdate
-
+    return maxdate,finishlinks
 #working with STORIES from ig
 def ig_stories(j):
     global bot,conn,cursor
@@ -180,8 +179,7 @@ def ig_stories(j):
         conn.commit()#write time
     cursor.execute("SELECT date FROM stories WHERE igname = ?",(j,))
     lastdate=cursor.fetchone()[0]
-    finishlinks=set()
-    parseMainPageIgStory(j,lastdate,finishlinks)#return links to stories
+    lastdate,finishlinks=parseMainPageIgStory(j,lastdate)#return links to stories
     cursor.execute("DELETE FROM stories WHERE igname = ?",(j,))
     cursor.execute("INSERT INTO stories VALUES(?,?)",(j,lastdate,))
     conn.commit()#rewrite lastdate
