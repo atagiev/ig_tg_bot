@@ -157,17 +157,20 @@ def parseMainPageIgStory(j,lastdate,finishlinks):
     workinglink="https://storiesig.com/?username="+j
     r=requests.get(workinglink)
     b=bs4.BeautifulSoup(r.text,"html.parser")
-    if (b.find("strong").getText()<>"0 stories"):
-        parseMainStoryPage(j,lastcheck,finishlinks)
-        if (lastcheck>maxdate):
-            maxdate=lastcheck
-    for i in b.find_all("time"):
-        lastcheck=lastdate
-        if (str(i.get("datetime"))>lastdate):
-            workinglink="https://storiesig.com"+str(i.parent.parent.get("href"))
-            parseSubStoryPage(workinglink,lastcheck,finishlinks)
+    try:
+        if (b.find("strong").getText()<>"0 stories"):
+            parseMainStoryPage(j,lastcheck,finishlinks)
             if (lastcheck>maxdate):
                 maxdate=lastcheck
+        for i in b.find_all("time"):
+            lastcheck=lastdate
+            if (str(i.get("datetime"))>lastdate):
+                workinglink="https://storiesig.com"+str(i.parent.parent.get("href"))
+                parseSubStoryPage(workinglink,lastcheck,finishlinks)
+                if (lastcheck>maxdate):
+                    maxdate=lastcheck
+    except:
+        pass
     lastdate=maxdate
 
 #working with STORIES from ig
