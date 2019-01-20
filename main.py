@@ -1,5 +1,6 @@
 # need pip3 install telepot, feedparser, beautifulsoup4
 import time
+import datetime
 import telepot
 import config
 import sqlite3
@@ -133,10 +134,21 @@ def parseMainStoryPage(j,lastcheck,links):
 
 
 #parsing page with other stories
-def parseSubStoryPage(storylink,lastcheck,links):
-    парсим, проходимся по постам где дата больше чем lastcheck
-    добавляем ссылки на картинки и видео в множество links
-    pass
+def parseSubStoryPage(workinglink,lastcheck,links):
+    r=requests.get(workinglink)
+    b=bs4.BeautifulSoup(r.text,"html.parser")
+    for i in b.find_all("article"):
+        try:
+            links.append(i.img.get("src"))
+        except:
+            links.append(i.video.get("src"))
+        try:
+            s=i.span.getText()
+            s=s[s.find("(")+1:s.find(")")]
+            maxdate=str(datetime.datetime.strptime(s,"%m/%d/%Y, %I:%M:%S %p").strftime("%Y-%m-%dT%H-%M-%S.999Z"))
+        except:
+            pass
+    lastcheck=maxdate
 
 #parsing https://storiesig.com/?username=username
 def parseMainPageIgStory(j,lastdate,finishlinks):
@@ -156,9 +168,7 @@ def parseMainPageIgStory(j,lastdate,finishlinks):
             parseSubStoryPage(workinglink,lastcheck,links)
             if (lastcheck>maxdate):
                 maxdate=lastcheck
-
     lastdate=maxdate
-
 
 #working with STORIES from ig
 def ig_stories(j):
