@@ -1,5 +1,5 @@
 TOKEN=""
-admin_id=["",""]
+admin_id=["204596506"]
 help="Send 'add + username' to subscribe to Instagram user\n Send 'del + username' to unsubscribe Instagram user"
 start="Welkome\n Send 'add + username' to subscribe to Instagram user\n Send 'del + username' to unsubscribe Instagram user"
 stopBot="You killed the Bot"
