@@ -82,8 +82,6 @@ def Message_Work():
                 cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[4:],))
             elif ((text[0:3]=="del") or (text[0:3]=="Del")):
                 cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[4:],))
-#            else:#лучше убрать для безопасности
-#                cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text,))
             conn.commit()
             cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
             substring="Вы подписаны на:\n"
