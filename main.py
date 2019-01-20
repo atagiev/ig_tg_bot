@@ -138,7 +138,6 @@ def parseMainStoryPage(j,lastcheck,finishlinks):
             pass
     lastcheck=maxdate
 
-
 #parsing page with other stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
     r=requests.get(workinglink)
