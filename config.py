@@ -1,4 +1,4 @@
-TOKEN=""
+TOKEN="704108396:AAE0ZSoceBRfTJwmgKhBkAJJUhYir69rWP0"
 admin_id=["204596506"]
 help="Send 'add + username' to subscribe to Instagram user\n Send 'del + username' to unsubscribe Instagram user"
 start="Welkome\n Send 'add + username' to subscribe to Instagram user\n Send 'del + username' to unsubscribe Instagram user"
