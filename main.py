@@ -104,6 +104,8 @@ def parse_IG_posts(igname,postid,posttext):
 #working with new POSTS from ig
 def ig_posts(j):
     global conn,cursor,bot
+    postid=""
+    posttext=""
     parse_IG_posts(j,postid,posttext)
     try:
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
