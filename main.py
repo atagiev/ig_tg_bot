@@ -82,13 +82,14 @@ def Message_Work():
                 cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[4:],))
             elif ((text[0:3]=="del") or (text[0:3]=="Del")):
                 cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[4:],))
-            conn.commit()
-            cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
-            substring="Вы подписаны на:\n"
-            for i in cursor.fetchall():
-                substring=substring+i[0]+"\n"
-            bot.sendMessage(chat,substring)#send message with subscriptions
-            substring=""
+            if ((text[0:3]=="add") or (text[0:3]=="Add") or (text[0:3]=="del") or (text[0:3]=="Del")):
+                conn.commit()
+                cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
+                substring="Вы подписаны на:\n"
+                for i in cursor.fetchall():
+                    substring=substring+i[0]+"\n"
+                bot.sendMessage(chat,substring)#send message with subscriptions
+                substring=""
 
 #parsing rss from https://websta.me/rss/n/username
 def parse_IG_posts(igname,postid,posttext):
