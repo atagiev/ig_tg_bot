@@ -36,7 +36,7 @@ def Telegram_checker():
     while AllOk:
         try:
             upd=bot.getUpdates(-1)
-            msg_id=str(upd[0]["message"]["message_id"])
+            msg_id=upd[0]["message"]["message_id"]
             if (msg_id>m_id_old):
                 chat=upd[0]["message"]["chat"]["id"]
                 try:
@@ -44,7 +44,7 @@ def Telegram_checker():
                 except:
                     pass
                 m_id_old=msg_id
-                msg=chat+"%"+text
+                msg=str(chat)+"%"+text
                 msg_list.append(msg)
         except:
             pass
@@ -73,9 +73,10 @@ def Message_Work():
         elif ((text=="/log") and (chat in config.admin_id)):
             if logOn:
                 Log_Send(config.logmsgOff)
+                logOn=not logOn
             else:
+                logOn=not logOn
                 Log_Send(config.logmsgOff)
-            logOn=not logOn
         else:
             if ((text[0:3]=="add") or(text[0:3]=="Add")):
                 cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[4:],))
@@ -85,7 +86,7 @@ def Message_Work():
                 cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text,))
             conn.commit()
             cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
-            substring="Вы подписаны на \n"
+            substring="Вы подписаны на: \n"
             for i in cursor.fetchall():
                 substring=substring+i[0]+"\n"
             bot.sendMessage(chat,substring)#send message with subscriptions
