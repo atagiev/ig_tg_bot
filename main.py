@@ -36,7 +36,7 @@ def Telegram_checker():
     while AllOk:
         try:
             upd=bot.getUpdates(-1)
-            msg_id=upd[0]["message"]["message_id"]
+            msg_id=str(upd[0]["message"]["message_id"])
             if (msg_id>m_id_old):
                 chat=upd[0]["message"]["chat"]["id"]
                 try:
