@@ -112,7 +112,7 @@ def ig_posts(j):
         cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
         conn.commit()
     cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-    if (postid <> cursor.fetchone()[0]):
+    if not(postid == cursor.fetchone()[0]):
         cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
         cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#rewrite last post id
         conn.commit()
@@ -162,7 +162,7 @@ def parseMainPageIgStory(j,lastdate,finishlinks):
     r=requests.get(workinglink)
     b=bs4.BeautifulSoup(r.text,"html.parser")
     try:
-        if (b.find("strong").getText()<>"0 stories"):
+        if not(b.find("strong").getText()=="0 stories"):
             parseMainStoryPage(j,lastcheck,finishlinks)
             if (lastcheck>maxdate):
                 maxdate=lastcheck
