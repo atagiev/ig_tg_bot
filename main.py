@@ -1,6 +1,5 @@
 # need pip3 install telepot, feedparser, beautifulsoup4
 import time
-import datetime
 import telepot
 import config
 import sqlite3
@@ -103,24 +102,24 @@ def parse_IG_posts(igname,postid,posttext):
 
 #working with new POSTS from ig
 def ig_posts(j):
-        global conn,cursor,bot
-        parse_IG_posts(j,postid,posttext)
-        try:
-            cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-            cursor.fetchone()[0]#try to catch TypeError if no record with this igname
-        except:
-            #write postid instread of other to don't send post published before user send message to Telegram bot
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
-            conn.commit()
+    global conn,cursor,bot
+    parse_IG_posts(j,postid,posttext)
+    try:
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-        if (postid <> cursor.fetchone()[0]):
-            cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#rewrite last post id
-            conn.commit()
-            msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
-            cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
-            for i in cursor.fetchall():#sending messages to followers
-                bot.sendMessage(i[0],msgtext, Markdown)
+        cursor.fetchone()[0]#try to catch TypeError if no record with this igname
+    except:
+        #write postid instread of other to don't send post published before user send message to Telegram bot
+        cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
+        conn.commit()
+    cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
+    if (postid <> cursor.fetchone()[0]):
+        cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
+        cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#rewrite last post id
+        conn.commit()
+        msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
+        cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
+        for i in cursor.fetchall():#sending messages to followers
+            bot.sendMessage(i[0],msgtext, Markdown)
 
 #parsing https://storiesig.com/stories/username
 def parseMainStoryPage(j,lastcheck,finishlinks):
@@ -134,11 +133,11 @@ def parseMainStoryPage(j,lastcheck,finishlinks):
                     finishlinks.append(i.img.get("src"))
                 except:
                     finishlinks.append(i.video.get("src"))
-                maxdate=str(i.span.time.get("datetime"))
+                maxdate=str(i.span.time.get("datetime"))#stories are sorted by time, last story - max time
         except:
             pass
     lastcheck=maxdate
-    
+
 
 #parsing page with other stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
@@ -151,7 +150,7 @@ def parseSubStoryPage(workinglink,lastcheck,finishlinks):
                     finishlinks.append(i.img.get("src"))
                 except:
                     finishlinks.append(i.video.get("src"))
-                maxdate=str(i.span.time.get("datetime"))
+                maxdate=str(i.span.time.get("datetime"))#stories are sorted by time, last story - max time
         except:
             pass
     lastcheck=maxdate
