@@ -63,7 +63,7 @@ def Message_Work():
         chat=msg[:msg.find("%")]#working with archive of messages
         text=msg[msg.find("%")+1:]
         msg_list.remove(msg)#delete read message
-        if ((text=="/stopBot") and (chat in config.admin_id)):
+        if (((text=="/stopBot") or (text=="/stopbot")) and (chat in config.admin_id)):
             AllOk=False;
             bot.sendMessage(chat,config.stopBot)
         elif (text=="/help"):
@@ -82,11 +82,11 @@ def Message_Work():
                 cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[4:],))
             elif ((text[0:3]=="del") or (text[0:3]=="Del")):
                 cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[4:],))
-            else:
-                cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text,))
+#            else:#лучше убрать для безопасности
+#                cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text,))
             conn.commit()
             cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
-            substring="Вы подписаны на: \n"
+            substring="Вы подписаны на:\n"
             for i in cursor.fetchall():
                 substring=substring+i[0]+"\n"
             bot.sendMessage(chat,substring)#send message with subscriptions
@@ -94,12 +94,15 @@ def Message_Work():
 
 #parsing rss from https://websta.me/rss/n/username
 def parse_IG_posts(igname,postid,posttext):
-    workinglink="https://websta.me/rss/n/"+igname
-    myfeed=feedparser.parse(workinglink)
-    s=myfeed.entries[0]["link"]
-    postid=s[26:37]
-    s=myfeed.entries[0]["description"]
-    posttext=s[:s.find("<a href=https://")]
+    try:
+        workinglink="https://websta.me/rss/n/"+igname
+        myfeed=feedparser.parse(workinglink)
+        s=myfeed.entries[0]["link"]
+        postid=s[26:37]
+        s=myfeed.entries[0]["description"]
+        posttext=s[:s.find("<a href=https://")]
+    except:
+        pass
 
 #working with new POSTS from ig
 def ig_posts(j):
@@ -122,40 +125,26 @@ def ig_posts(j):
         msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
         cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
         for i in cursor.fetchall():#sending messages to followers
-            bot.sendMessage(i[0],msgtext, Markdown)
+            try:
+                bot.sendMessage(i[0],msgtext, Markdown)
+            except:
+                pass
 
-#parsing https://storiesig.com/stories/username
-def parseMainStoryPage(j,lastcheck,finishlinks):
-    workinglink="https://storiesig.com/stories/"+j
-    r=requests.get(workinglink)
-    b=bs4.BeautifulSoup(r.text,"html.parser")
-    for i in b.find_all("article"):
-        try:
-            if (str(i.span.time.get("datetime"))>lastcheck):
-                try:
-                    finishlinks.append(i.img.get("src"))
-                except:
-                    finishlinks.append(i.video.get("src"))
-                maxdate=str(i.span.time.get("datetime"))#stories are sorted by time, last story - max time
-        except:
-            pass
-    lastcheck=maxdate
-
-#parsing page with other stories
+#parsing page with stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
     r=requests.get(workinglink)
     b=bs4.BeautifulSoup(r.text,"html.parser")
-    for i in b.find_all("article"):
-        try:
+    try:
+        for i in b.find_all("article"):
             if (str(i.span.time.get("datetime"))>lastcheck):
                 try:
                     finishlinks.append(i.img.get("src"))
                 except:
                     finishlinks.append(i.video.get("src"))
                 maxdate=str(i.span.time.get("datetime"))#stories are sorted by time, last story - max time
-        except:
-            pass
-    lastcheck=maxdate
+        lastcheck=maxdate
+    except:
+        pass
 
 #parsing https://storiesig.com/?username=username
 def parseMainPageIgStory(j,lastdate,finishlinks):
@@ -166,7 +155,8 @@ def parseMainPageIgStory(j,lastdate,finishlinks):
     b=bs4.BeautifulSoup(r.text,"html.parser")
     try:
         if not(b.find("strong").getText()=="0 stories"):
-            parseMainStoryPage(j,lastcheck,finishlinks)
+            workinglink="https://storiesig.com/stories/"+j
+            parseSubStoryPage(workinglink,lastcheck,finishlinks)
             if (lastcheck>maxdate):
                 maxdate=lastcheck
         for i in b.find_all("time"):
