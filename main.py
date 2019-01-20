@@ -1,6 +1,5 @@
 # need pip3 install telepot, feedparser, beautifulsoup4
 import time
-import datetime
 import telepot
 import config
 import sqlite3
@@ -8,6 +7,7 @@ import feedparser
 import requests
 import bs4
 from threading import Thread
+from datetime import datetime
 
 AllOk=True#program works while True
 logOn=False#if True - logs are enabled
@@ -129,7 +129,7 @@ def ig_posts(j):
         cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
         for i in cursor.fetchall():#sending messages to followers
             try:
-                bot.sendMessage(i[0],msgtext, Markdown)
+                bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
             except:
                 pass
 
@@ -192,7 +192,7 @@ def ig_stories(j):
     for k in cursor.fetchall():
         for i in finishlinks:
             msgtext=j+" posted new [story]("+i+")"
-            bot.sendMessage(k[0],msgtext,Markdown)
+            bot.sendMessage(k[0],msgtext,parse_mode= 'Markdown')
     finishlinks.clear()
 
 #Working with Instagram
@@ -206,7 +206,7 @@ def Instagram_Work():
     for j in allIGnicks:
         ig_posts(j)
         ig_stories(j)
-    #чистка баз post && stories
+    #clean tables post && stories
     cursor.execute("SELECT * FROM posts")
     for i in cursor.fetchall():
         if not(i[0] in allIGnicks):
