@@ -203,6 +203,21 @@ def Instagram_Work():
     for j in allIGnicks:
         ig_posts(j)
         ig_stories(j)
+    #чистка баз post && stories
+    cursor.execute("SELECT * FROM posts")
+    for i in cursor.fetchall():
+        if not(i[0] in allIGnicks):
+            try:
+                cursor.execute("DELETE FROM posts WHERE igname=?",(i[0],))
+            except:
+                pass
+    cursor.execute("SELECT * FROM stories")
+    for i in cursor.fetchall():
+        if not(i[0] in allIGnicks):
+            try:
+                cursor.execute("DELETE FROM stories WHERE igname=?",(i[0],))
+            except:
+                pass
 
 #main
 Thread(target=Telegram_checker).start()#in a parallel thread messages are recorded in the archive msg_list
