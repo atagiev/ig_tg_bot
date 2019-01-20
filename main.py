@@ -76,7 +76,7 @@ def Message_Work():
                 logOn=not logOn
             else:
                 logOn=not logOn
-                Log_Send(config.logmsgOff)
+                Log_Send(config.logmsgOn)
         else:
             if ((text[0:3]=="add") or(text[0:3]=="Add")):
                 cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[4:],))
