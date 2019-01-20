@@ -214,5 +214,6 @@ while AllOk:
 
 f=open("message_id.txt","w")#saving important data before exit
 f.write(str(m_id_old))
-Log_Send(config.logmsgBotOff)
+f.close()
 cursor.close()
+Log_Send(config.logmsgBotOff)
