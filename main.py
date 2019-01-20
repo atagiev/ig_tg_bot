@@ -127,11 +127,18 @@ def parseMainStoryPage(j,lastcheck,finishlinks):
     workinglink="https://storiesig.com/stories/"+j
     r=requests.get(workinglink)
     b=bs4.BeautifulSoup(r.text,"html.parser")
-    парсим, проходимся по постам где дата больше чем lastcheck
-    добавляем ссылки на картинки и видео в множество links
-    смотрим дату последнего поста и заменяем lastcheck на нее
-    pass
-
+    for i in b.find_all("article"):
+        try:
+            if (str(i.span.time.get("datetime"))>lastcheck):
+                try:
+                    finishlinks.append(i.img.get("src"))
+                except:
+                    finishlinks.append(i.video.get("src"))
+                maxdate=str(i.span.time.get("datetime"))
+        except:
+            pass
+    lastcheck=maxdate
+    
 
 #parsing page with other stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
@@ -139,13 +146,12 @@ def parseSubStoryPage(workinglink,lastcheck,finishlinks):
     b=bs4.BeautifulSoup(r.text,"html.parser")
     for i in b.find_all("article"):
         try:
-            finishlinks.append(i.img.get("src"))
-        except:
-            finishlinks.append(i.video.get("src"))
-        try:
-            s=i.span.getText()
-            s=s[s.find("(")+1:s.find(")")]
-            maxdate=str(datetime.datetime.strptime(s,"%m/%d/%Y, %I:%M:%S %p").strftime("%Y-%m-%dT%H-%M-%S.999Z"))
+            if (str(i.span.time.get("datetime"))>lastcheck):
+                try:
+                    finishlinks.append(i.img.get("src"))
+                except:
+                    finishlinks.append(i.video.get("src"))
+                maxdate=str(i.span.time.get("datetime"))
         except:
             pass
     lastcheck=maxdate
