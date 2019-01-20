@@ -123,7 +123,7 @@ def ig_posts(j):
                 bot.sendMessage(i[0],msgtext, Markdown)
 
 #parsing https://storiesig.com/stories/username
-def parseMainStoryPage(j,lastcheck,links):
+def parseMainStoryPage(j,lastcheck,finishlinks):
     workinglink="https://storiesig.com/stories/"+j
     r=requests.get(workinglink)
     b=bs4.BeautifulSoup(r.text,"html.parser")
@@ -134,14 +134,14 @@ def parseMainStoryPage(j,lastcheck,links):
 
 
 #parsing page with other stories
-def parseSubStoryPage(workinglink,lastcheck,links):
+def parseSubStoryPage(workinglink,lastcheck,finishlinks):
     r=requests.get(workinglink)
     b=bs4.BeautifulSoup(r.text,"html.parser")
     for i in b.find_all("article"):
         try:
-            links.append(i.img.get("src"))
+            finishlinks.append(i.img.get("src"))
         except:
-            links.append(i.video.get("src"))
+            finishlinks.append(i.video.get("src"))
         try:
             s=i.span.getText()
             s=s[s.find("(")+1:s.find(")")]
@@ -165,7 +165,7 @@ def parseMainPageIgStory(j,lastdate,finishlinks):
         lastcheck=lastdate
         if (str(i.get("datetime"))>lastdate):
             workinglink="https://storiesig.com"+str(i.parent.parent.get("href"))
-            parseSubStoryPage(workinglink,lastcheck,links)
+            parseSubStoryPage(workinglink,lastcheck,finishlinks)
             if (lastcheck>maxdate):
                 maxdate=lastcheck
     lastdate=maxdate
