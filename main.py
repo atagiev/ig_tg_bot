@@ -118,27 +118,24 @@ def ig_posts(j):
     try:
         workinglink="https://websta.me/rss/n/"+j
         postid,posttext=parse_IG_posts(workinglink)
-    except:
-        postid,posttext="",""
-    try:
+        try:
+            cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
+            cursor.fetchone()[0]#try to catch TypeError if no record with this igname
+        except:
+            #write postid instread of other to don't send post published before user send message to Telegram bot
+            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
+            conn.commit()
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-        cursor.fetchone()[0]#try to catch TypeError if no record with this igname
-    except:
-        #write postid instread of other to don't send post published before user send message to Telegram bot
-        cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
-        conn.commit()
-    cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-    if not(postid == cursor.fetchone()[0]):
-        cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
-        cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#rewrite last post id
-        conn.commit()
-        msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
-        cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
-        for i in cursor.fetchall():#sending messages to followers
-            try:
+        if not(postid == cursor.fetchone()[0]):
+            cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
+            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#rewrite last post id
+            conn.commit()
+            msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
+            cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
+            for i in cursor.fetchall():#sending messages to followers
                 bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
-            except:
-                pass
+    except:
+        pass
 
 #parsing page with stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
