@@ -109,7 +109,7 @@ def parse_IG_posts(j,lastlink):
     myfeed=feedparser.parse(workinglink)
     postlinks=[]
     try:
-        for i in myfeed.entries
+        for i in myfeed.entries:
             s=myfeed.entries[i]["id"]
             postlink="https://instagram.com/p/"+s[26:27]
             if (postlink==lastlink):
@@ -155,7 +155,7 @@ def ig_posts(j):
     cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
     for i in cursor.fetchall():#sending messages to followers
         for k in postlinks:
-            if (len(k)=k.find("%")+1):
+            if (len(k)==k.find("%")+1):
                 msgtext=j+" posted new [photo]("+k[:k.find("%")]+") wiht comment:\n"+k[k.find("%"):]
             else:
                 msgtext=j+" posted new [photo]("+k[:-1]+")"
