@@ -110,11 +110,11 @@ def parse_IG_posts(j,lastlink):
     postlinks=[]
     try:
         for i in myfeed.entries:
-            s=myfeed.entries[i]["id"]
-            postlink="https://instagram.com/p/"+s[26:27]
+            s=i["id"]
+            postlink="https://www.instagram.com/p/"+s[26:37]+"/"
             if (postlink==lastlink):
                 break
-            s=myfeed.entries[i]["summary"]
+            s=i["summary"]
             postlink=postlink+"%"+s[:s.find("<a href=https://")]
             postlinks.append(postlink)
     except:
@@ -125,7 +125,10 @@ def parse_IG_posts(j,lastlink):
 def parse_last_post(j):
     workinglink="https://queryfeed.net/instagram?q="+j
     myfeed=feedparser.parse(workinglink)
-    postlink=myfeed.entries[0]["link"]
+    try:
+        postlink=myfeed.entries[0]["link"]
+    except:
+        postlink=""
     return postlink
 
 #working with new POSTS from ig
@@ -136,10 +139,7 @@ def ig_posts(j):
         cursor.fetchone()[0]#try to catch TypeError if no record with this igname
     except:
         #write postid instread of other to don't send post published before user send message to Telegram bot
-        try:
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,parse_last_post(j),))
-        except:
-            pass
+        cursor.execute("INSERT INTO posts VALUES(?,?)",(j,parse_last_post(j),))
         conn.commit()
 
     cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))#last post link
@@ -156,7 +156,7 @@ def ig_posts(j):
     for i in cursor.fetchall():#sending messages to followers
         for k in postlinks:
             if (len(k)==k.find("%")+1):
-                msgtext=j+" posted new [photo]("+k[:k.find("%")]+") wiht comment:\n"+k[k.find("%"):]
+                msgtext=j+" posted new [photo]("+k[:k.find("%")]+") wiht comment:\n"+k[k.find("%")+1:]
             else:
                 msgtext=j+" posted new [photo]("+k[:-1]+")"
             bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
