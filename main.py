@@ -110,7 +110,8 @@ def parse_IG_posts(igname):
 def ig_posts(j):
     global conn,cursor,bot
     try:
-        postid,posttext=parse_IG_posts(j)
+        workinglink="https://instagram.com/"+j
+        postid,posttext=parse_IG_posts(workinglink)
     except:
         postid,posttext="",""
     try:
@@ -173,6 +174,7 @@ def parseMainPageIgStory(j,lastdate):
     except:
         pass
     return maxdate,finishlinks
+
 #working with STORIES from ig
 def ig_stories(j):
     global bot,conn,cursor
@@ -203,9 +205,6 @@ def Instagram_Work():
     cursor.execute("SELECT igname FROM subs")
     for j in cursor.fetchall():
         allIGnicks.add(j[0])#collect all Ig names into set
-    for j in allIGnicks:
-        ig_posts(j)
-        ig_stories(j)
     #clean tables post && stories
     cursor.execute("SELECT * FROM posts")
     for i in cursor.fetchall():
@@ -221,6 +220,9 @@ def Instagram_Work():
                 cursor.execute("DELETE FROM stories WHERE igname=?",(i[0],))
             except:
                 pass
+    for j in allIGnicks:
+        ig_posts(j)
+        ig_stories(j)
 
 #main
 Thread(target=Telegram_checker).start()#in a parallel thread messages are recorded in the archive msg_list
