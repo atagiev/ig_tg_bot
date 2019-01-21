@@ -97,12 +97,11 @@ def Message_Work():
                 substring=""
 
 #parsing rss from https://websta.me/rss/n/username
-def parse_IG_posts(igname):
-    workinglink="https://websta.me/rss/n/"+igname
+def parse_IG_posts(workinglink):
     myfeed=feedparser.parse(workinglink)
-    s=myfeed.entries[0]["link"]
+    s=myfeed.entries[0]["id"]
     postid=s[26:37]
-    s=myfeed.entries[0]["description"]
+    s=myfeed.entries[0]["summary"]
     posttext=s[:s.find("<a href=https://")]
     return postid,posttext
 
@@ -110,7 +109,7 @@ def parse_IG_posts(igname):
 def ig_posts(j):
     global conn,cursor,bot
     try:
-        workinglink="https://instagram.com/"+j
+        workinglink="https://websta.me/rss/n/"+j
         postid,posttext=parse_IG_posts(workinglink)
     except:
         postid,posttext="",""
