@@ -155,13 +155,11 @@ def ig_posts(j):
     cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
     for i in cursor.fetchall():#sending messages to followers
         for k in postlinks:
-            if (len(k)==k.find("%")+1):
-                msgtext=j+" posted new [photo]("+k[:k.find("%")]+") wiht comment:\n"+k[k.find("%")+1:]
+            if not(len(k)==k.find("%")+1):
+                msgtext=j+" posted new [photo]("+k[:k.find("%")]+") with comment:\n"+"_"+k[k.find("%")+1:]+"_"
             else:
                 msgtext=j+" posted new [photo]("+k[:-1]+")"
             bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
-
-
 
 #parsing page with stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
