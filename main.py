@@ -103,37 +103,35 @@ def Message_Work():
                 bot.sendMessage(chat,substring)#send message with subscriptions
                 substring=""
 
-#parsing rss from https://websta.me/rss/n/username
+#parsing rss from https://queryfeed.net/instagram?q=username
 def parse_IG_posts(workinglink):
     myfeed=feedparser.parse(workinglink)
-    s=myfeed.entries[0]["id"]
-    postid=s[26:37]
-    s=myfeed.entries[0]["summary"]
-    posttext=s[:s.find("<a href=https://")]
-    return postid,posttext
+    postlink=myfeed.entries[0]["link"]
+    posttext=myfeed.entries[0]["description"]
+    return postlink,posttext
 
 #working with new POSTS from ig
 def ig_posts(j):
     global conn,cursor,bot
     try:
-        workinglink="https://websta.me/rss/n/"+j
-        postid,posttext=parse_IG_posts(workinglink)
+        workinglink="https://queryfeed.net/instagram?q="+j
+        postlink,posttext=parse_IG_posts(workinglink)
         try:
             cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
             cursor.fetchone()[0]#try to catch TypeError if no record with this igname
         except:
             #write postid instread of other to don't send post published before user send message to Telegram bot
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))
+            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postlink,))
             conn.commit()
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-        if not(postid == cursor.fetchone()[0]):
+        if not(postlink == cursor.fetchone()[0]):
             cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#rewrite last post id
+            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postlink,))#rewrite last post id
             conn.commit()
             if (posttext==""):
-                msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"
+                msgtext=j+" posted new [photo]("+postlink+")"
             else:
-                msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
+                msgtext=j+" posted new [photo]("+postlink+")"+" with comment:\n"+"_"+posttext+"_"
             cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
             for i in cursor.fetchall():#sending messages to followers
                 bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
