@@ -103,40 +103,65 @@ def Message_Work():
                 bot.sendMessage(chat,substring)#send message with subscriptions
                 substring=""
 
-#parsing rss from https://queryfeed.net/instagram?q=username
-def parse_IG_posts(workinglink):
+#parsing rss from https://web.stagram.com/rss/n/username
+def parse_IG_posts(j,lastlink):
+    workinglink="https://web.stagram.com/rss/n/"+j
+    myfeed=feedparser.parse(workinglink)
+    postlinks=[]
+    try:
+        for i in myfeed.entries
+            s=myfeed.entries[i]["id"]
+            postlink="https://instagram.com/p/"+s[26:27]
+            if (postlink==lastlink):
+                break
+            s=myfeed.entries[i]["summary"]
+            postlink=postlink+"%"+s[:s.find("<a href=https://")]
+            postlinks.append(postlink)
+    except:
+        pass
+    return postlinks
+
+#parse one last post from https://queryfeed.net/instagram?q=username
+def parse_last_post(j):
+    workinglink="https://queryfeed.net/instagram?q="+j
     myfeed=feedparser.parse(workinglink)
     postlink=myfeed.entries[0]["link"]
-    posttext=myfeed.entries[0]["description"]
-    return postlink,posttext
+    return postlink
 
 #working with new POSTS from ig
 def ig_posts(j):
     global conn,cursor,bot
     try:
-        workinglink="https://queryfeed.net/instagram?q="+j
-        postlink,posttext=parse_IG_posts(workinglink)
-        try:
-            cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-            cursor.fetchone()[0]#try to catch TypeError if no record with this igname
-        except:
-            #write postid instread of other to don't send post published before user send message to Telegram bot
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postlink,))
-            conn.commit()
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
-        if not(postlink == cursor.fetchone()[0]):
-            cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postlink,))#rewrite last post id
-            conn.commit()
-            if (posttext==""):
-                msgtext=j+" posted new [photo]("+postlink+")"
-            else:
-                msgtext=j+" posted new [photo]("+postlink+")"+" with comment:\n"+"_"+posttext+"_"
-            cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
-            for i in cursor.fetchall():#sending messages to followers
-                bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
+        cursor.fetchone()[0]#try to catch TypeError if no record with this igname
+    except:
+        #write postid instread of other to don't send post published before user send message to Telegram bot
+        try:
+            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,parse_last_post(j),))
+        except:
+            pass
+        conn.commit()
+
+    cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))#last post link
+    postlinks=parse_IG_posts(j,cursor.fetchone()[0])
+    try:
+        postlink=postlinks[0]
+        postlink=postlink[:postlink.find("%")]
+        cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
+        cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postlink,))#rewrite last post link
+        conn.commit()
     except:
         pass
+    cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
+    for i in cursor.fetchall():#sending messages to followers
+        for k in postlinks:
+            if (len(k)=k.find("%")+1):
+                msgtext=j+" posted new [photo]("+k[:k.find("%")]+") wiht comment:\n"+k[k.find("%"):]
+            else:
+                msgtext=j+" posted new [photo]("+k[:-1]+")"
+            bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
+
+
 
 #parsing page with stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
