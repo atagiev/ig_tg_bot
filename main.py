@@ -130,7 +130,10 @@ def ig_posts(j):
             cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
             cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postid,))#rewrite last post id
             conn.commit()
-            msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
+            if (posttext==""):
+                msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"
+            else:
+                msgtext=j+" posted new [photo](https://instagram.com/p/"+postid+")"+" with comment:\n"+"_"+posttext+"_"
             cursor.execute("SELECT tgid FROM subs WHERE igname=? ",(j,))
             for i in cursor.fetchall():#sending messages to followers
                 bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
