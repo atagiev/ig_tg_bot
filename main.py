@@ -64,13 +64,20 @@ def Message_Work():
         chat=msg[:msg.find("%")]#working with archive of messages
         text=msg[msg.find("%")+1:]
         msg_list.remove(msg)#delete read message
-        if (((text=="/stopBot") or (text=="/stopbot")) and (chat in config.admin_id)):
+        if ((text=="/stopbot") and (chat in config.admin_id)):
             AllOk=False;
             bot.sendMessage(chat,config.stopBot)
         elif (text=="/help"):
             bot.sendMessage(chat,config.help)
         elif (text=="/start"):
             bot.sendMessage(chat,config.start)
+        elif (text=="/sub"):
+            cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
+            substring="Вы подписаны на:\n"
+            for i in cursor.fetchall():
+                substring=substring+i[0]+"\n"
+            bot.sendMessage(chat,substring)#send message with subscriptions
+            substring=""
         elif ((text=="/log") and (chat in config.admin_id)):
             if logOn:
                 Log_Send(config.logmsgOff)
