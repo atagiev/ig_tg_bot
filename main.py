@@ -265,6 +265,6 @@ f.write(str(m_id_old))
 f.close()
 cursor.close()
 for i in config.admin_id:
-    bot.sendDocument(i,open("database.db","f"))
-    bot.sendDocument(i,open("message_id.txt","f"))
+    bot.sendDocument(i,open("database.db","r"))
+    bot.sendDocument(i,open("message_id.txt","r"))
 Log_Send(config.logmsgBotOff)
