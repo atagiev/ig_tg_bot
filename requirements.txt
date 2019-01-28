@@ -1,0 +1,4 @@
+telepot
+feedparser
+beautifulsoup4
+requests

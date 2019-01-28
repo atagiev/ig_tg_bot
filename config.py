@@ -1,7 +1,7 @@
 TOKEN="704108396:AAE0ZSoceBRfTJwmgKhBkAJJUhYir69rWP0"
 admin_id=["204596506"]
-help="Send 'add + username' to subscribe to Instagram user\nSend 'del + username' to unsubscribe from Instagram user"
-start="Welkome\n Send 'add + username' to subscribe to Instagram user\nSend 'del + username' to unsubscribe from Instagram user"
+help="Send 'add username' to subscribe to Instagram user\nSend 'del username' to unsubscribe from Instagram user"
+start="Welkome\n Send 'add username' to subscribe to Instagram user\nSend 'del username' to unsubscribe from Instagram user"
 stopBot="You killed the Bot"
 logmsgOn="Logs enabled"
 logmsgOff="Logs disabled"
