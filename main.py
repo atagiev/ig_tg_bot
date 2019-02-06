@@ -80,8 +80,11 @@ def Message_Work():
             substring=""
         elif (text=="/backup"):
             for i in config.admin_id:
-                bot.sendDocument(i,open("database.db","rb"))
-                bot.sendDocument(i,open("message_id.txt","r"))
+                try:
+                    bot.sendDocument(i,open("database.db","rb"))
+                    bot.sendDocument(i,open("message_id.txt","r"))
+                except:
+                    pass
         elif ((text=="/log") and (chat in config.admin_id)):
             if logOn:
                 Log_Send(config.logmsgOff)
