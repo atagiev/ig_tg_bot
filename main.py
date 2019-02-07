@@ -78,7 +78,7 @@ def Message_Work():
                 substring=substring+i[0]+"\n"
             bot.sendMessage(chat,substring)#send message with subscriptions
             substring=""
-        elif (text=="/backup"):
+        elif ((text=="/backup")and (chat in config.admin_id)):
             for i in config.admin_id:
                 try:
                     bot.sendDocument(i,open("database.db","rb"))
