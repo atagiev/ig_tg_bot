@@ -12,6 +12,7 @@ from datetime import datetime
 AllOk=True#program works while True
 logOn=False#if True - logs are enabled
 time_OLD=time.time()#time of last Instagram check
+starttime = time.time()
 msg_list=[]#archive of telegram messages
 f=open("message_id.txt","r")#last telegram message
 m_id_old=int(f.read())
@@ -266,12 +267,12 @@ while AllOk:
         time_OLD=time.time()
         Instagram_Work()
         Log_Send(config.logmsgInstagramCheck)
+    if ((time.time()-starttime)>18000):
+        AllOk=false
+        Log_Send(config.restartmsg)
 
 f=open("message_id.txt","w")#saving important data before exit
 f.write(str(m_id_old))
 f.close()
 cursor.close()
-for i in config.admin_id:
-    bot.sendDocument(i,open("database.db","rb"))
-    bot.sendDocument(i,open("message_id.txt","r"))
 Log_Send(config.logmsgBotOff)
