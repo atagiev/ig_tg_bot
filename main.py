@@ -43,7 +43,7 @@ def Telegram_checker():
                 try:
                     text=upd[0]["message"]["text"]
                 except:
-                    pass
+                    text="_"
                 m_id_old=msg_id
                 msg=str(chat)+"%"+text
                 msg_list.append(msg)
