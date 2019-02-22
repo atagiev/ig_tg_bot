@@ -95,12 +95,12 @@ def Message_Work():
         else:
             if ((text[0:3]=="add") or(text[0:3]=="Add")):
                 try:
-                    cursor.execute("SELECT * FROM subs WHERE tgid = ? AND igname=?",(chat,text[3:].strip(),))
+                    cursor.execute("SELECT * FROM subs WHERE tgid = ? AND igname=?",(chat,text[3:].strip().lower(),))
                     cursor.fetchone()[0]
                 except:
-                    cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[3:].strip(),))
+                    cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[3:].strip().lower(),))
             elif ((text[0:3]=="del") or (text[0:3]=="Del")):
-                cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[3:].strip(),))
+                cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[3:].strip().lower(),))
             if ((text[0:3]=="add") or (text[0:3]=="Add") or (text[0:3]=="del") or (text[0:3]=="Del")):
                 conn.commit()
                 cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
