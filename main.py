@@ -59,7 +59,7 @@ def Log_Send(msg):
 
 #processing incoming messages from msg_list
 def Message_Work():
-    global cursor,conn,bot,AllOk,msg_list,logOn
+    global cursor,conn,bot,AllOk,msg_list,logOn,m_id_old
     for msg in msg_list:
         chat=msg[:msg.find("%")]#working with archive of messages
         text=msg[msg.find("%")+1:]
@@ -79,8 +79,7 @@ def Message_Work():
             bot.sendMessage(chat,substring)#send message with subscriptions
         elif ((text=="/backup")and (chat in config.admin_id)):
             try:
-                bot.sendDocument(chat,open("database.db","rb"))
-                bot.sendDocument(chat,open("message_id.txt","r"))
+                bot.sendDocument(chat,open("database.db","rb"),caption=m_id_old)
             except:
                 pass
         elif ((text=="/log") and (chat in config.admin_id)):
