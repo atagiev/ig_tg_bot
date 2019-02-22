@@ -77,14 +77,12 @@ def Message_Work():
             for i in cursor.fetchall():
                 substring=substring+i[0]+"\n"
             bot.sendMessage(chat,substring)#send message with subscriptions
-            substring=""
         elif ((text=="/backup")and (chat in config.admin_id)):
-            for i in config.admin_id:
-                try:
-                    bot.sendDocument(i,open("database.db","rb"))
-                    bot.sendDocument(i,open("message_id.txt","r"))
-                except:
-                    pass
+            try:
+                bot.sendDocument(chat,open("database.db","rb"))
+                bot.sendDocument(chat,open("message_id.txt","r"))
+            except:
+                pass
         elif ((text=="/log") and (chat in config.admin_id)):
             if logOn:
                 Log_Send(config.logmsgOff)
@@ -125,7 +123,7 @@ def parse_IG_posts(j,lastlink):
             postlink=postlink+"%"+s[:s.find("<a href=https://")]
             postlinks.append(postlink)
     except:
-        pass
+        Log_Send(config.logmsgWebstagram)
     return postlinks
 
 #parse one last post from https://queryfeed.net/instagram?q=username
@@ -136,6 +134,7 @@ def parse_last_post(j):
         postlink=myfeed.entries[0]["link"]
     except:
         postlink=""
+        Log_Send(config.logmsgQuerry)
     return postlink
 
 #working with new POSTS from ig
@@ -181,7 +180,7 @@ def parseSubStoryPage(workinglink,lastcheck,finishlinks):
                     finishlinks.add(i.video.get("src"))
                 maxdate=str(i.span.time.get("datetime"))#stories are sorted by time, last story - max time
     except:
-        pass
+        Log_Send(config.logmsgSubStory)
     return maxdate,finishlinks
 
 #parsing https://storiesig.com/?username=username
@@ -206,7 +205,7 @@ def parseMainPageIgStory(j,lastdate):
                 if (lastcheck>maxdate):
                     maxdate=lastcheck
     except:
-        pass
+        Log_Send(config.logmsgMainStory)
     return maxdate,finishlinks
 
 #working with STORIES from ig
@@ -268,7 +267,7 @@ while AllOk:
             Instagram_Work()
             Log_Send(config.logmsgInstagramCheck)
     except:
-        pass
+        Log_Send(config.logmsgMainError)
 f=open("message_id.txt","w")#saving important data before exit
 f.write(str(m_id_old))
 f.close()
