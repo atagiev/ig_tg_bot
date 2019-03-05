@@ -266,7 +266,7 @@ while AllOk:
             Instagram_Work()
             Log_Send(config.logmsgInstagramCheck)
     except:
-        Log_Send(config.logmsgMainError)
+        pass
 f=open("message_id.txt","w")#saving important data before exit
 f.write(str(m_id_old))
 f.close()
