@@ -170,6 +170,7 @@ def ig_posts(j):
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
     r=requests.get(workinglink)
     b=bs4.BeautifulSoup(r.text,"html.parser")
+    maxdate=lastcheck
     try:
         for i in b.find_all("article"):
             if (str(i.span.time.get("datetime"))>lastcheck):
