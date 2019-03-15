@@ -45,7 +45,7 @@ def Telegram_checker():
                 except:
                     text="_"
                 m_id_old=msg_id
-                msg=str(chat)+"%"+text
+                msg=(str(chat),text,)
                 msg_list.append(msg)
         except:
             pass
@@ -61,8 +61,8 @@ def Log_Send(msg):
 def Message_Work():
     global cursor,conn,bot,AllOk,msg_list,logOn,m_id_old
     for msg in msg_list:
-        chat=msg[:msg.find("%")]#working with archive of messages
-        text=msg[msg.find("%")+1:]
+        chat=msg[0]#working with archive of messages
+        text=msg[1]
         msg_list.remove(msg)#delete read message
         if ((text=="/stopbot") and (chat in config.admin_id)):
             AllOk=False;
@@ -119,8 +119,8 @@ def parse_IG_posts(j,lastlink):
             if (postlink==lastlink):
                 break
             s=i["summary"]
-            postlink=postlink+"%"+s[:s.find("<a href=https://")]
-            postlinks.append(postlink)
+            tuple=(postlink,s[:s.find("<a href=https://")],)
+            postlinks.append(tuple)
     except:
         Log_Send(config.logmsgWebstagram)
     return postlinks
@@ -150,8 +150,7 @@ def ig_posts(j):
     cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))#last post link
     postlinks=parse_IG_posts(j,cursor.fetchone()[0])
     try:
-        postlink=postlinks[0]
-        postlink=postlink[:postlink.find("%")]
+        postlink=postlinks[0][0]
         cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
         cursor.execute("INSERT INTO posts VALUES(?,?)",(j,postlink,))#rewrite last post link
         conn.commit()
@@ -160,10 +159,10 @@ def ig_posts(j):
     cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
     for i in cursor.fetchall():#sending messages to followers
         for k in postlinks:
-            if not(len(k)==k.find("%")+1):
-                msgtext=j+" posted new [photo]("+k[:k.find("%")]+") with comment:\n"+"_"+k[k.find("%")+1:]+"_"
+            if not(k[1]==""):
+                msgtext=j+" posted new [photo]("+k[0]+") with comment:\n"+"_"+k[1]+"_"
             else:
-                msgtext=j+" posted new [photo]("+k[:-1]+")"
+                msgtext=j+" posted new [photo]("+k[0]+")"
             bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
 
 #parsing page with stories
@@ -192,7 +191,7 @@ def parseMainPageIgStory(j,lastdate):
     r=requests.get(workinglink)
     b=bs4.BeautifulSoup(r.text,"html.parser")
     try:
-        if not(b.find("strong").getText()=="0 stories"):
+        if not((b.find("strong").getText()=="0 stories") or (b.find("strong").getText()=="This Account is Private")):
             workinglink="https://storiesig.com/stories/"+j
             lastcheck,finishlinks=parseSubStoryPage(workinglink,lastcheck,finishlinks)
             if (lastcheck>maxdate):
