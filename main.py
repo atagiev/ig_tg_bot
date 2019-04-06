@@ -199,10 +199,12 @@ def parseMainPageIgStory(j,lastdate):
         for i in b.find_all("time"):
             lastcheck=lastdate
             if (str(i.get("datetime"))>lastdate):
-                workinglink="https://storiesig.com"+str(i.parent.parent.get("href"))
-                lastcheck,finishlinks=parseSubStoryPage(workinglink,lastcheck,finishlinks)
-                if (lastcheck>maxdate):
-                    maxdate=lastcheck
+                workinglink=str(i.parent.parent.get("href"))
+                if not(workinglink=="None"):
+                    workinglink="https://storiesig.com"+workinglink
+                    lastcheck,finishlinks=parseSubStoryPage(workinglink,lastcheck,finishlinks)
+                    if (lastcheck>maxdate):
+                        maxdate=lastcheck
     except:
         Log_Send(config.logmsgMainStory)
     return maxdate,finishlinks
