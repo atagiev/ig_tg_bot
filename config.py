@@ -1,4 +1,4 @@
-TOKEN="704108396:AAE0ZSoceBRfTJwmgKhBkAJJUhYir69rWP0"
+TOKEN="BOT_TOKEN"
 admin_id=["YOUR_ID_IN_TELEGRAM"]
 help="Send 'add username' to subscribe to Instagram user\nSend 'del username' to unsubscribe from Instagram user"
 start="Welkome\n Send 'add username' to subscribe to Instagram user\nSend 'del username' to unsubscribe from Instagram user"

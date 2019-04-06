@@ -73,7 +73,7 @@ def Message_Work():
             bot.sendMessage(chat,config.start)
         elif (text=="/sub"):
             cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
-            substring="Вы подписаны на:\n"
+            substring="You are subscribed to:\n"
             for i in cursor.fetchall():
                 substring=substring+i[0]+"\n"
             bot.sendMessage(chat,substring)#send message with subscriptions
@@ -101,11 +101,10 @@ def Message_Work():
             if ((text[0:3]=="add") or (text[0:3]=="del")):
                 conn.commit()
                 cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
-                substring="Вы подписаны на:\n"
+                substring="You are subscribed to:\n"
                 for i in cursor.fetchall():
                     substring=substring+i[0]+"\n"
                 bot.sendMessage(chat,substring)#send message with subscriptions
-                substring=""
 
 #parsing rss from https://web.stagram.com/rss/n/username
 def parse_IG_posts(j,lastlink):
