@@ -39,14 +39,14 @@ def Telegram_checker():
             upd=bot.getUpdates(-1)
             msg_id=upd[0]["message"]["message_id"]
             if (msg_id>m_id_old):
+                m_id_old=msg_id
                 chat=upd[0]["message"]["chat"]["id"]
                 try:
                     text=upd[0]["message"]["text"]
+                    msg=(str(chat),text,)
+                    msg_list.append(msg)
                 except:
-                    text="_"
-                m_id_old=msg_id
-                msg=(str(chat),text,)
-                msg_list.append(msg)
+                    pass
         except:
             pass
 
@@ -158,10 +158,10 @@ def ig_posts(j):
     cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
     for i in cursor.fetchall():#sending messages to followers
         for k in postlinks:
-            if not(k[1]==""):
-                msgtext=j+" posted new [photo]("+k[0]+") with comment:\n"+"_"+k[1]+"_"
-            else:
+            if (k[1]==""):
                 msgtext=j+" posted new [photo]("+k[0]+")"
+            else:
+                msgtext=j+" posted new [photo]("+k[0]+") with comment:\n"+"_"+k[1]+"_"
             bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
 
 #parsing page with stories
@@ -271,8 +271,8 @@ while AllOk:
 f=open("message_id.txt","w")#saving important data before exit
 f.write(str(m_id_old))
 f.close()
+cursor.close()
 for i in config.admin_id:
     bot.sendDocument(i,open("database.db","rb"))
     bot.sendDocument(i,open("message_id.txt","r"))
-cursor.close()
 Log_Send(config.logmsgBotOff)
