@@ -1,4 +1,4 @@
-telepot
+pytelegrambotapi
 feedparser
 beautifulsoup4
 requests

@@ -1,13 +1,2 @@
 TOKEN="BOT_TOKEN"
 admin_id=["YOUR_ID_IN_TELEGRAM"]
-help="Send 'add username' to subscribe to Instagram user\nSend 'del username' to unsubscribe from Instagram user"
-start="Welkome\n Send 'add username' to subscribe to Instagram user\nSend 'del username' to unsubscribe from Instagram user"
-stopBot="You killed the Bot"
-logmsgOn="Logs enabled"
-logmsgOff="Logs disabled"
-logmsgInstagramCheck="One more Instagram check done"
-logmsgBotOff="Bot turned off"
-logmsgWebstagram="Problem with Webstagram"
-logmsgQuerry="Problem with Querry"
-logmsgSubStory="Problem with SubStory"
-logmsgMainStory="Problem with MainStory"
