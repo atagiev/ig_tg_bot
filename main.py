@@ -2,6 +2,7 @@
 import time
 import telepot
 import config
+import phrases
 import sqlite3
 import feedparser
 import requests
@@ -10,11 +11,9 @@ from threading import Thread
 from datetime import datetime
 
 AllOk=True#program works while True
-logOn=False#if True - logs are enabled
 time_OLD=time.time()#time of last Instagram check
 msg_list=[]#archive of telegram messages
-f=open("message_id.txt","r")#last telegram message
-m_id_old=int(f.read())
+m_id_old=0
 bot=telepot.Bot(config.TOKEN)
 conn=sqlite3.connect("database.db")#connecting database
 cursor=conn.cursor()
@@ -50,45 +49,32 @@ def Telegram_checker():
         except:
             pass
 
-#send logs to admins
-def Log_Send(msg):
-    global bot,logOn
-    if logOn:
-        for i in config.admin_id:
-            bot.sendMessage(i,msg)
 
 #processing incoming messages from msg_list
 def Message_Work():
-    global cursor,conn,bot,AllOk,msg_list,logOn,m_id_old
+    global cursor,conn,bot,AllOk,msg_list,m_id_old
     for msg in msg_list:
         chat=msg[0]#working with archive of messages
         text=msg[1].lower()
         msg_list.remove(msg)#delete read message
-        if ((text=="/stopbot") and (chat in config.admin_id)):
+        if ((text=="/stopbot") and (chat == config.admin_id)):
             AllOk=False;
-            bot.sendMessage(chat,config.stopBot)
+            bot.sendMessage(chat,phrases.stopBot)
         elif (text=="/help"):
-            bot.sendMessage(chat,config.help)
+            bot.sendMessage(chat,phrases.help)
         elif (text=="/start"):
-            bot.sendMessage(chat,config.start)
+            bot.sendMessage(chat,phrases.start)
         elif (text=="/sub"):
             cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
             substring="You are subscribed to:\n"
             for i in cursor.fetchall():
                 substring=substring+i[0]+"\n"
             bot.sendMessage(chat,substring)#send message with subscriptions
-        elif ((text=="/backup")and (chat in config.admin_id)):
+        elif ((text=="/backup")and (chat == config.admin_id)):
             try:
                 bot.sendDocument(chat,open("database.db","rb"),caption=m_id_old)
             except:
                 pass
-        elif ((text=="/log") and (chat in config.admin_id)):
-            if logOn:
-                Log_Send(config.logmsgOff)
-                logOn=not logOn
-            else:
-                logOn=not logOn
-                Log_Send(config.logmsgOn)
         else:
             if (text[0:3]=="add"):
                 try:
@@ -121,7 +107,7 @@ def parse_IG_posts(j,lastlink):
             tuple=(postlink,s[:s.find("<a href=https://")],)
             postlinks.append(tuple)
     except:
-        Log_Send(config.logmsgWebstagram)
+        pass
     return postlinks
 
 #parse one last post from https://queryfeed.net/instagram?q=username
@@ -132,7 +118,6 @@ def parse_last_post(j):
         postlink=myfeed.entries[0]["link"]
     except:
         postlink=""
-        Log_Send(config.logmsgQuerry)
     return postlink
 
 #working with new POSTS from ig
@@ -178,7 +163,7 @@ def parseSubStoryPage(workinglink,lastcheck,finishlinks):
                     finishlinks.add(i.video.get("src"))
                 maxdate=str(i.span.time.get("datetime"))#stories are sorted by time, last story - max time
     except:
-        Log_Send(config.logmsgSubStory)
+        pass
     return maxdate,finishlinks
 
 #parsing https://storiesig.com/?username=username
@@ -205,7 +190,7 @@ def parseMainPageIgStory(j,lastdate):
                     if (lastcheck>maxdate):
                         maxdate=lastcheck
     except:
-        Log_Send(config.logmsgMainStory)
+        pass
     return maxdate,finishlinks
 
 #working with STORIES from ig
@@ -265,14 +250,7 @@ while AllOk:
         if ((time.time()-time_OLD)>120):#check Instagram every 2 minutes
             time_OLD=time.time()
             Instagram_Work()
-            Log_Send(config.logmsgInstagramCheck)
     except:
         pass
-f=open("message_id.txt","w")#saving important data before exit
-f.write(str(m_id_old))
-f.close()
 cursor.close()
-for i in config.admin_id:
-    bot.sendDocument(i,open("database.db","rb"))
-    bot.sendDocument(i,open("message_id.txt","r"))
-Log_Send(config.logmsgBotOff)
+bot.sendDocument(config.admin_id,open("database.db","rb"),caption=m_id_old)
