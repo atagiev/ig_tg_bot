@@ -41,13 +41,13 @@ def send_start(message):
 @bot.message_handler(commands=['stopbot'])
 def send_stop(message):
     global AllOk
-    if (message.chat.id in config.admin_id):
+    if (message.chat.id == config.admin_id):
         AllOk=False
         bot.reply_to(message,phrases.stopBot)
 
 @bot.message_handler(commands=['backup'])
 def send_backup(message):
-    if (message.chat.id in config.admin_id):
+    if (message.chat.id == config.admin_id):
         try:
             bot.send_document(message.chat.id,open("database.db","rb"),caption=m_id_old)
         except:
@@ -243,5 +243,4 @@ while AllOk:
     except:
         pass
 cursor.close()
-for i in config.admin_id:
-    bot.send_document(i,open("database.db","rb"),caption=m_id_old)
+bot.send_document(config.admin_id,open("database.db","rb"),caption=m_id_old)
