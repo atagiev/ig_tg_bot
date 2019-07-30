@@ -1,4 +1,4 @@
-# need pip3 install telepot, feedparser, beautifulsoup4
+# need pip3 install telepot, feedparser, beautifulsoup4, requests
 import time
 import telepot
 import config
