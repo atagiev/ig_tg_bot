@@ -58,7 +58,7 @@ def Message_Work():
         text=msg[1].lower()
         msg_list.remove(msg)#delete read message
         if ((text=="/stopbot") and (chat == config.admin_id)):
-            AllOk=False;
+            AllOk=False
             bot.sendMessage(chat,phrases.stopBot)
         elif (text=="/help"):
             bot.sendMessage(chat,phrases.help)
@@ -92,19 +92,16 @@ def Message_Work():
                     substring=substring+i[0]+"\n"
                 bot.sendMessage(chat,substring)#send message with subscriptions
 
-#parsing rss from https://web.stagram.com/rss/n/username
+#parsing rss from https://queryfeed.net/instagram?q=username
 def parse_IG_posts(j,lastlink):
-    workinglink="https://web.stagram.com/rss/n/"+j
+    workinglink="https://queryfeed.net/instagram?q="+j
     myfeed=feedparser.parse(workinglink)
     postlinks=[]
     try:
         for i in myfeed.entries:
-            s=i["id"]
-            postlink="https://www.instagram.com/p/"+s[26:37]+"/"
-            if (postlink==lastlink):
+            if (i.link==lastlink):
                 break
-            s=i["summary"]
-            tuple=(postlink,s[:s.find("<a href=https://")],)
+            tuple=(i.link,i.description,)
             postlinks.append(tuple)
     except:
         pass
@@ -115,7 +112,7 @@ def parse_last_post(j):
     workinglink="https://queryfeed.net/instagram?q="+j
     myfeed=feedparser.parse(workinglink)
     try:
-        postlink=myfeed.entries[0]["link"]
+        postlink=myfeed.entries[0].link
     except:
         postlink=""
     return postlink
