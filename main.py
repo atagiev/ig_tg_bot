@@ -70,27 +70,27 @@ def Message_Work():
             for i in cursor.fetchall():
                 substring=substring+i[0]+"\n"
             bot.sendMessage(chat,substring)#send message with subscriptions
-        elif ((text=="/backup")and (chat == config.admin_id)):
+        elif ((text=="/backup") and (chat == config.admin_id)):
             try:
                 bot.sendDocument(chat,open("database.db","rb"),caption=m_id_old)
             except:
                 pass
-        else:
-            if (text[0:3]=="add"):
-                try:
-                    cursor.execute("SELECT * FROM subs WHERE tgid = ? AND igname=?",(chat,text[3:].strip(),))
-                    cursor.fetchone()[0]
-                except:
-                    cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[3:].strip(),))
-            elif (text[0:3]=="del"):
-                cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[3:].strip(),))
-            if ((text[0:3]=="add") or (text[0:3]=="del")):
-                conn.commit()
-                cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
-                substring="You are subscribed to:\n"
-                for i in cursor.fetchall():
-                    substring=substring+i[0]+"\n"
-                bot.sendMessage(chat,substring)#send message with subscriptions
+        elif (text[0:3]=="add"):
+            try:
+                cursor.execute("SELECT * FROM subs WHERE tgid = ? AND igname=?",(chat,text[3:].strip(),))
+                cursor.fetchone()[0]
+            except:
+                cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[3:].strip(),))
+        elif (text[0:3]=="del"):
+            cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[3:].strip(),))
+
+        if ((text[0:3]=="add") or (text[0:3]=="del")):
+            conn.commit()
+            cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
+            substring="You are subscribed to:\n"
+            for i in cursor.fetchall():
+                substring=substring+i[0]+"\n"
+            bot.sendMessage(chat,substring)#send message with subscriptions
 
 #parsing rss from https://queryfeed.net/instagram?q=username
 def parse_IG_posts(j,lastlink):
