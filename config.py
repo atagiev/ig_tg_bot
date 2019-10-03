@@ -1,3 +1,2 @@
 TOKEN="BOT_TOKEN"
 admin_id="YOUR_ID_IN_TELEGRAM"
-
