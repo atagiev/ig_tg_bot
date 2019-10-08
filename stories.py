@@ -1,7 +1,6 @@
 import requests, bs4
 from datetime import datetime
 
-
 #parsing page with stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
     r=requests.get(workinglink)
@@ -45,7 +44,6 @@ def parseMainPage(j,lastdate):
     except:
         pass
     return maxdate,finishlinks
-
 
 #working with STORIES from ig
 def ig(j, bot, conn, cursor):

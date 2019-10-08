@@ -26,7 +26,7 @@ def parse_last(j):
     return postlink
 
 #working with new POSTS from ig
-def ig_posts(j, conn, cursor, bot):
+def ig(j, bot, conn, cursor):
     try:
         cursor.execute("SELECT postid FROM posts WHERE igname = ?",(j,))
         cursor.fetchone()[0]#try to catch TypeError if no record with this igname

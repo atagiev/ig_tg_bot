@@ -35,13 +35,14 @@ def Telegram_checker():
         except:
             pass
 
+#send message with subscriptions
 def subList(chat):
     global bot,cursor
     cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
     substring=phrases.substring
     for i in cursor.fetchall():
         substring=substring+i[0]+"\n"
-    bot.sendMessage(chat,substring)#send message with subscriptions
+    bot.sendMessage(chat,substring)
 
 #processing incoming messages from msg_list
 def Message_Work():
