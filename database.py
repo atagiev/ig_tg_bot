@@ -10,7 +10,7 @@ def create():
   except:
       pass
   try:
-      cursor.execute("CREATE TABLE posts (igname text, postid text)")#table Instagram name - id of last post
+      cursor.execute("CREATE TABLE posts (igname text, timestamp integer)")#table Instagram name - id of last post
   except:
       pass
   try:
@@ -20,15 +20,12 @@ def create():
   return conn, cursor
 
 def restore(msg,conn,cursor):
+    cursor.close()
     try:
-        cursor.close()
-        try:
-            urlretrieve(msg[2],"database.db")
-        except:
-            pass
-        return create()
+        urlretrieve(msg[2],"database.db")
     except:
         pass
+    return create()
 
 def backup(bot):
     try:

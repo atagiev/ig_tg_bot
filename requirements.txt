@@ -1,4 +1,3 @@
 python-telegram-bot
-feedparser
 beautifulsoup4
 requests

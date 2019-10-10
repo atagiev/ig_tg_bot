@@ -19,19 +19,16 @@ def Telegram_checker():
             if (msg_id>m_id_old):
                 m_id_old=msg_id
                 chat=str(upd[0].message.chat.id)
-                try:
-                    text=upd[0].message.text
-                    if text == None:
-                        try:
-                            if chat == config.admin_id:
-                                msg=(chat,"database",bot.getFile(upd[0].message.document.file_id).file_path)
-                                msg_list.append(msg)
-                        except:
-                            pass
-                    else:
-                        msg_list.append((chat,text))
-                except:
-                    pass
+                text=upd[0].message.text
+                if text == None:
+                    try:
+                        if chat == config.admin_id:
+                            msg=(chat,"database",bot.getFile(upd[0].message.document.file_id).file_path)
+                            msg_list.append(msg)
+                    except:
+                        pass
+                else:
+                    msg_list.append((chat,text))
         except:
             pass
 
@@ -97,7 +94,7 @@ Thread(target=Telegram_checker).start()#in a parallel thread messages are record
 while AllOk:
     try:
         Message_Work()
-        if ((time.time()-time_IG)>120): #check Instagram every 2 minutes 
+        if ((time.time()-time_IG)>240): #check Instagram every 2 minutes 
             time_IG=time.time()
             Instagram_Work()
     except:
