@@ -43,4 +43,4 @@ def work(cursor,conn,bot,AllOk,msg_list):
             subList(bot, cursor, chat)
 
         msg_list.remove(msg)#delete read message
-    return AllOk, msg_list
+    return cursor, conn, AllOk, msg_list

@@ -40,7 +40,7 @@ def Instagram_Work():
 Thread(target=Telegram_checker).start()#in a parallel thread messages are recorded in the archive msg_list
 while AllOk:
     try:
-        AllOk, msg_list=message.work(cursor, conn, bot, AllOk, msg_list)
+        cursor, conn, AllOk, msg_list=message.work(cursor, conn, bot, AllOk, msg_list)
         if ((time.time()-time_IG)>240): #check Instagram every 4 minutes 
             time_IG=time.time()
             Instagram_Work()
