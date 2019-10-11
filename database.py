@@ -10,7 +10,7 @@ def create():
   except:
       pass
   try:
-      cursor.execute("CREATE TABLE posts (igname text, timestamp integer)")#table Instagram name - id of last post
+      cursor.execute("CREATE TABLE posts (igname text, timestamp integer)")#table Instagram name - timestamp of last post
   except:
       pass
   try:
