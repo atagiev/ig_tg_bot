@@ -38,16 +38,15 @@ def ig(j, bot, conn, cursor):
             cursor.execute("SELECT timestamp FROM posts WHERE igname = ?",(j,))
             cursor.fetchone()[0]#try to catch TypeError if no record with this igname
         except:
-            #write timestamp instread of other to don't send post published before user send message to Telegram bot
             cursor.execute("INSERT INTO posts VALUES(?,?)",(j,parse_last(j),))
-            conn.commit()
-    
+            conn.commit()#write timestamp instread of other to don't send post published before user send message to Telegram bot
+        
         cursor.execute("SELECT timestamp FROM posts WHERE igname = ?",(j,))#last time
         timestamp=cursor.fetchone()[0]
-        postlinks,newtimestamp=parse(j,timestamp)
+        postlinks, newtimestamp=parse(j, timestamp)
         if newtimestamp > timestamp :
             cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
-            cursor.execute("INSERT INTO posts VALUES(?,?)",(j,newtimestamp,))#rewrite last time
+            cursor.execute("INSERT INTO posts VALUES(?,?)",(j, newtimestamp,))#rewrite last time
             conn.commit()
         cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
         for i in cursor.fetchall():#sending messages to followers

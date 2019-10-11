@@ -1,5 +1,5 @@
 import time, telegram
-import config, phrases, database, stories, posts
+import config, database, stories, posts, message
 from threading import Thread
 
 AllOk=True#program works while True
@@ -18,62 +18,9 @@ def Telegram_checker():
             msg_id=upd[0].message.message_id
             if (msg_id>m_id_old):
                 m_id_old=msg_id
-                chat=str(upd[0].message.chat.id)
-                text=upd[0].message.text
-                if text == None:
-                    try:
-                        if chat == config.admin_id:
-                            msg=(chat,"database",bot.getFile(upd[0].message.document.file_id).file_path)
-                            msg_list.append(msg)
-                    except:
-                        pass
-                else:
-                    msg_list.append((chat,text))
+                msg_list.append(upd[0])
         except:
             pass
-
-#send message with subscriptions
-def subList(chat):
-    global bot,cursor
-    cursor.execute("SELECT igname FROM subs WHERE tgid = ?",(chat,))
-    substring=phrases.substring
-    for i in cursor.fetchall():
-        substring=substring+i[0]+"\n"
-    bot.sendMessage(chat,substring)
-
-#processing incoming messages from msg_list
-def Message_Work():
-    global cursor,conn,bot,AllOk,msg_list
-    for msg in msg_list:
-        chat, text = msg[0], msg[1].lower()#working with archive of messages
-        if ((text=="database") and (chat==config.admin_id)):
-            conn, cursor = database.restore(msg,conn,cursor)
-        elif ((text=="/stopbot") and (chat==config.admin_id)):
-            AllOk=False
-            bot.sendMessage(chat,phrases.stopBot)
-        elif (text=="/help"):
-            bot.sendMessage(chat,phrases.help)
-        elif (text=="/start"):
-            bot.sendMessage(chat,phrases.start)
-        elif (text=="/sub"):
-            subList(chat)
-        elif ((text=="/backup") and (chat==config.admin_id)):
-            database.backup(bot)
-        elif (text[0:3]=="add"):
-            try:
-                cursor.execute("SELECT * FROM subs WHERE tgid = ? AND igname=?",(chat,text[3:].strip(),))
-                cursor.fetchone()[0]
-            except:
-                cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[3:].strip(),))
-            conn.commit()
-            subList(chat)
-        elif (text[0:3]=="del"):
-            cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[3:].strip(),))
-            conn.commit()
-            subList(chat)
-
-        msg_list.remove(msg)#delete read message
-
 
 #Working with Instagram
 def Instagram_Work():
@@ -93,8 +40,8 @@ def Instagram_Work():
 Thread(target=Telegram_checker).start()#in a parallel thread messages are recorded in the archive msg_list
 while AllOk:
     try:
-        Message_Work()
-        if ((time.time()-time_IG)>240): #check Instagram every 2 minutes 
+        AllOk, msg_list=message.work(cursor, conn, bot, AllOk, msg_list)
+        if ((time.time()-time_IG)>240): #check Instagram every 4 minutes 
             time_IG=time.time()
             Instagram_Work()
     except:

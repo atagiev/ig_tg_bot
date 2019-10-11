@@ -19,10 +19,13 @@ def create():
       pass
   return conn, cursor
 
-def restore(msg,conn,cursor):
-    cursor.close()
+def restore(bot,msg,conn,cursor):
     try:
-        urlretrieve(msg[2],"database.db")
+        filename=msg.message.document.file_name
+        if filename=="database.db":
+            cursor.close()
+            path=bot.getFile(msg.message.document.file_id).file_path
+            urlretrieve(path,filename)
     except:
         pass
     return create()
@@ -33,8 +36,8 @@ def backup(bot):
     except:
         pass
 
+#clean tables post && stories
 def clean(cursor, allIGnicks):
-    #clean tables post && stories
     cursor.execute("SELECT * FROM posts")
     for i in cursor.fetchall():
         if not(i[0] in allIGnicks):
