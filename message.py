@@ -31,14 +31,14 @@ def work(cursor,conn,bot,AllOk,msg_list):
             database.backup(bot)
         elif (text[0:3]=="add"):
             try:
-                cursor.execute("SELECT * FROM subs WHERE tgid = ? AND igname=?",(chat,text[3:].strip(),))
+                cursor.execute("SELECT * FROM subs WHERE tgid = ? AND igname=?",(chat,text[3:].replace(" ",""),))
                 cursor.fetchone()[0]
             except:
-                cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[3:].strip(),))
+                cursor.execute("INSERT INTO subs VALUES(?,?)",(chat,text[3:].replace(" ",""),))
             conn.commit()
             subList(bot, cursor, chat)
         elif (text[0:3]=="del"):
-            cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[3:].strip(),))
+            cursor.execute("DELETE FROM subs WHERE (tgid= ?) AND (igname= ?)",(chat,text[3:].replace(" ",""),))
             conn.commit()
             subList(bot, cursor, chat)
 

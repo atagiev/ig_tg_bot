@@ -9,8 +9,11 @@ def parse(j, timestamp):
         for i in r.json()["graphql"]["user"]["edge_owner_to_timeline_media"]["edges"]:
             if i["node"]["taken_at_timestamp"]>timestamp:
                 link="https://instagram.com/p/"+i["node"]["shortcode"]
-                msg=i["node"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
-                postlinks.append((link,msg))
+                try:
+                    msg=i["node"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
+                    postlinks.append((link,msg))
+                except:
+                    postlinks.append((link,))
             else:
                 break
         try:
@@ -30,6 +33,12 @@ def parse_last(j):
     except:
         return 0
 
+def msgtext(j,k):
+    if len(k)==1:
+        text=j+' posted new <a href="'+k[0]+'">photo</a>'
+    else:
+        text=j+' posted new <a href="'+k[0]+'">photo</a> with comment:\n <i>'+k[1]+'</i>'
+    return text
 
 #working with new POSTS from ig
 def ig(j, bot, conn, cursor):
@@ -51,10 +60,6 @@ def ig(j, bot, conn, cursor):
         cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
         for i in cursor.fetchall():#sending messages to followers
             for k in postlinks:
-                if (k[1]==""):
-                    msgtext=j+" posted new [photo]("+k[0]+")"
-                else:
-                    msgtext=j+" posted new [photo]("+k[0]+") with comment:\n"+"_"+k[1]+"_"
-                bot.sendMessage(i[0],msgtext, parse_mode= 'Markdown')
+                bot.sendMessage(i[0],msgtext(j,k), parse_mode= 'HTML')
     except:
         pass
