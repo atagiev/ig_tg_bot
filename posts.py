@@ -37,7 +37,7 @@ def msgtext(j,k):
     if len(k)==1:
         text=j+' posted new <a href="'+k[0]+'">photo</a>'
     else:
-        text=j+' posted new <a href="'+k[0]+'">photo</a> with comment:\n <i>'+k[1]+'</i>'
+        text=j+' posted new <a href="'+k[0]+'">photo</a> with comment:\n<i>'+k[1]+'</i>'
     return text
 
 #working with new POSTS from ig

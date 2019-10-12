@@ -61,6 +61,6 @@ def ig(j, bot, conn, cursor):
     cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
     for k in cursor.fetchall():
         for i in finishlinks:
-            msgtext=j+" posted new [story]("+i+")"
-            bot.sendMessage(k[0],msgtext,parse_mode= 'Markdown')
+            msgtext=j+' posted new <a href="'+i+'">story</a>'
+            bot.sendMessage(k[0],msgtext,parse_mode= 'HTML')
     finishlinks.clear()
