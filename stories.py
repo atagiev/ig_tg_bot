@@ -52,7 +52,7 @@ def ig(j, bot, conn, cursor):
             cursor.execute("SELECT date FROM stories WHERE igname = ?",(j,))
             cursor.fetchone()[0]#try to catch TypeError if no record with this igname
         except:
-            cursor.execute("INSERT INTO stories VALUES(?,?)",(j,datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S.999Z"),))
+            cursor.execute("INSERT INTO stories VALUES(?,?)",(j,datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.999Z"),))
             conn.commit()#write time
         cursor.execute("SELECT date FROM stories WHERE igname = ?",(j,))
         lastdate,finishlinks=parseMainPage(j,cursor.fetchone()[0])#return links to stories
