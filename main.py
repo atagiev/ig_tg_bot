@@ -41,7 +41,7 @@ Thread(target=Telegram_checker).start()#in a parallel thread messages are record
 while AllOk:
     try:
         cursor, conn, AllOk, msg_list=message.work(cursor, conn, bot, AllOk, msg_list)
-        if ((time.time()-time_IG)>4000): #check Instagram every 40 minutes 
+        if ((time.time()-time_IG)>4000): #check Instagram every 4000 seconds 
             time_IG=time.time()
             Instagram_Work()
     except:
