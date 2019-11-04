@@ -17,10 +17,10 @@ def parse(j, timestamp):
             else:
                 break
         try:
-            timestamp=r.json()["graphql"]["user"]["edge_owner_to_timeline_media"]["edges"][0]["node"]["taken_at_timestamp"]
+            newtimestamp=r.json()["graphql"]["user"]["edge_owner_to_timeline_media"]["edges"][0]["node"]["taken_at_timestamp"]
         except:
-            timestamp=0
-        return postlinks, timestamp
+            newtimestamp=timestamp
+        return postlinks, newtimestamp
     except:
         return [], timestamp
 
