@@ -6,7 +6,7 @@ def create():
   conn = sqlite3.connect("database.db")#connecting database
   cursor = conn.cursor()
   try:
-      cursor.execute("CREATE TABLE subs (tgid text, igname text)")#table telegram name - account in Instagram
+      cursor.execute("CREATE TABLE subs (ttid text, igname text)")#table tamtam id - account in Instagram
   except:
       pass
   try:
@@ -19,20 +19,26 @@ def create():
       pass
   return conn, cursor
 
-def restore(bot,msg,conn,cursor):
+def restore(msg,conn,cursor):
+    cursor.close()
     try:
-        filename=msg.message.document.file_name
+        filename=msg["body"]["attachments"][0]["filename"]
         if filename=="database.db":
-            cursor.close()
-            path=bot.getFile(msg.message.document.file_id).file_path
+            path=msg["body"]["attachments"][0]["payload"]["url"]
             urlretrieve(path,filename)
     except:
-        pass
+        try:
+            filename=msg["link"]["message"]["attachments"][0]["filename"]
+            if filename=="database.db":
+                path=msg["link"]["message"]["attachments"][0]["payload"]["url"]
+                urlretrieve(path,filename)
+        except:
+            pass
     return create()
 
 def backup(bot):
     try:
-        bot.sendDocument(config.admin_id,open("database.db","rb"))
+        bot.send_file("database.db",config.admin_chat_id)
     except:
         pass
 

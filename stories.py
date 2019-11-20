@@ -1,5 +1,6 @@
-import requests, bs4
+import requests, os, bs4
 from datetime import datetime
+from urllib.request import urlretrieve
 
 #parsing page with stories
 def parseSubStoryPage(workinglink,lastcheck,finishlinks):
@@ -45,6 +46,13 @@ def parseMainPage(j,lastdate):
         pass
     return maxdate,finishlinks
 
+def send_story(bot,igname,link,subs):
+    text=igname+' posted new story'
+    urlretrieve(link, "story")
+    for sub in subs:
+        bot.send_file("story",sub,text)
+    os.remove("story")
+
 #working with STORIES from ig
 def ig(j, bot, conn, cursor):
     try:
@@ -59,11 +67,16 @@ def ig(j, bot, conn, cursor):
         cursor.execute("DELETE FROM stories WHERE igname = ?",(j,))
         cursor.execute("INSERT INTO stories VALUES(?,?)",(j,lastdate,))
         conn.commit()#rewrite lastdate
-        cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
+        cursor.execute("SELECT ttid FROM subs WHERE igname = ?",(j,))
+        subs=[]
         for k in cursor.fetchall():
-            for i in finishlinks:
-                msgtext=j+' posted new <a href="'+i+'">story</a>'
-                bot.sendMessage(k[0],msgtext,parse_mode= 'HTML')
+            subs.append(k)
+        for i in finishlinks:
+            try:
+                send_story(bot,j,i,subs)
+            except:
+                pass
         finishlinks.clear()
+        subs.clear()
     except:
         pass

@@ -1,24 +1,21 @@
-import time, telegram
+import time
 import config, database, stories, posts, message
 from threading import Thread
-
+from botapi import BotHandler
 AllOk=True#program works while True
 time_IG=time.time()#time of last Instagram check
-msg_list=[]#archive of telegram messages
-m_id_old=0
-bot=telegram.Bot(token=config.TOKEN)
+msg_list=[]#archive of tamtam messages
+bot=BotHandler(config.TOKEN)
 conn,cursor=database.create()
 
-#parallel thread to check new Telegram messages
-def Telegram_checker():
-    global bot,msg_list,m_id_old,AllOk
+#parallel thread to check new TamTam messages
+def TamTam_checker():
+    global bot,msg_list,AllOk
     while AllOk:
         try:
-            upd=bot.getUpdates(-1)
-            msg_id=upd[0].message.message_id
-            if (msg_id>m_id_old):
-                m_id_old=msg_id
-                msg_list.append(upd[0])
+            upd=bot.get_updates(None)
+            if upd != None:
+                msg_list.append(upd["updates"][0]["message"])
         except:
             pass
 
@@ -37,11 +34,11 @@ def Instagram_Work():
         stories.ig(j, bot, conn, cursor)
 
 #main
-Thread(target=Telegram_checker).start()#in a parallel thread messages are recorded in the archive msg_list
+Thread(target=TamTam_checker).start()#in a parallel thread messages are recorded in the archive msg_list
 while AllOk:
     try:
         cursor, conn, AllOk, msg_list=message.work(cursor, conn, bot, AllOk, msg_list)
-        if ((time.time()-time_IG)>4000): #check Instagram every 4000 seconds 
+        if ((time.time()-time_IG)>4000): 
             time_IG=time.time()
             Instagram_Work()
     except:

@@ -17,10 +17,10 @@ def parse(j, timestamp):
             else:
                 break
         try:
-            newtimestamp=r.json()["graphql"]["user"]["edge_owner_to_timeline_media"]["edges"][0]["node"]["taken_at_timestamp"]
+            timestamp=r.json()["graphql"]["user"]["edge_owner_to_timeline_media"]["edges"][0]["node"]["taken_at_timestamp"]
         except:
-            newtimestamp=timestamp
-        return postlinks, newtimestamp
+            timestamp=0
+        return postlinks, timestamp
     except:
         return [], timestamp
 
@@ -35,9 +35,9 @@ def parse_last(j):
 
 def msgtext(j,k):
     if len(k)==1:
-        text=j+' posted new <a href="'+k[0]+'">photo</a>'
+        text=j+' posted new photo\n'+k[0]
     else:
-        text=j+' posted new <a href="'+k[0]+'">photo</a> with comment:\n<i>'+k[1]+'</i>'
+        text=j+' posted new photo with comment:\n'+k[1]+'\n'+k[0]
     return text
 
 #working with new POSTS from ig
@@ -57,9 +57,9 @@ def ig(j, bot, conn, cursor):
             cursor.execute("DELETE FROM posts WHERE igname = ?",(j,))
             cursor.execute("INSERT INTO posts VALUES(?,?)",(j, newtimestamp,))#rewrite last time
             conn.commit()
-        cursor.execute("SELECT tgid FROM subs WHERE igname = ?",(j,))
+        cursor.execute("SELECT ttid FROM subs WHERE igname = ?",(j,))
         for i in cursor.fetchall():#sending messages to followers
             for k in postlinks:
-                bot.sendMessage(i[0],msgtext(j,k), parse_mode= 'HTML')
+                bot.send_message(msgtext(j,k),i[0])
     except:
         pass

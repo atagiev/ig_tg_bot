@@ -1,4 +1,4 @@
-help="Send 'add username' to subscribe to Instagram user\nSend 'del username' to unsubscribe from Instagram user"
-start="Welkome\n"+help
-stopBot="You just killed the Bot"
-substring="You are following these people:\n"
+help='Отправь "add username", чтобы начать получать обновления этого пользователя.\nЧтобы отписаться - отправь команду "del username"'
+start="Привет\n"+help
+stopBot="Бот остановлен"
+substring="Вы подписаны на:\n"

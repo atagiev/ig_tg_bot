@@ -1,2 +1,2 @@
-TOKEN="BOT_TOKEN"
-admin_id="YOUR_ID_IN_TELEGRAM"
+TOKEN="YOUR_TOKEN"
+admin_chat_id="YOUR_ID"
